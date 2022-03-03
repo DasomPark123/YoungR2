@@ -1,8 +1,12 @@
 <resources>
+    <!-- Main -->
     <string name="app_name">YoungR2</string>
     <string name="edit_text_hint">식품 이름을 입력하세요</string>
     <string name="search_by_category">종류별 찾기</string>
     <string name="search_by_barcode">바코드로 찾기</string>
+
+    <!--Product List-->
+    <string name="no_data">검색한 상품이 존재하지 않습니다.</string>
 
     <!-- snackbar -->
     <string name="request_input_text">식품이름을 검색해 주세요.</string>

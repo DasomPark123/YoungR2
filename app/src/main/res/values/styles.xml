@@ -46,6 +46,11 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="col_717171_14_font">
+        <item name="android:textColor">@color/col_717171</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="col_717171_11_font">
         <item name="android:textColor">@color/col_717171</item>
         <item name="android:textSize">11sp</item>

@@ -3,6 +3,7 @@ package com.example.youngr2
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youngr2.adapter.NutrientAdapter
@@ -56,7 +57,7 @@ class NutrientListActivity :
         /* Result observing */
         viewModel.nutrientResult.observe(this) {
             progressBar.dismiss()
-            checkResult(it)
+            updateResult(it)
         }
         /* Error observing */
         viewModel.nutrientError.observe(this) {
@@ -108,13 +109,16 @@ class NutrientListActivity :
         viewModel.requestNutrientRepositories(product)
     }
 
-    private fun checkResult(result: NutrientResultModel) {
+    private fun updateResult(result: NutrientResultModel) {
         when(result.code) {
-            "INFO-000" -> {
+            NutrientConst.SUCCESS -> {
                 Log.d(tag,result.msg)
             }
-            "INFO-200" -> {
-                //TODO: recyclerview visibility gone 처리 및 해당 데이터가 없다는 화면 띄우기
+            NutrientConst.NO_DATA -> {
+                binding.apply {
+                    rvNutrients.visibility = View.GONE
+                    tvNoData.visibility= View.VISIBLE
+                }
             }
             else -> {
                 showSnackBar(binding.llNutrientList, result.msg)

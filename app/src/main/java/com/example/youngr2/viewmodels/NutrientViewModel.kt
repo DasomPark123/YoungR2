@@ -2,6 +2,7 @@ package com.example.youngr2.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.youngr2.NutrientConst
 import com.example.youngr2.models.NutrientResultModel
 import com.example.youngr2.models.NutrientRowModel
 import com.example.youngr2.repositories.NutrientRepository
@@ -24,7 +25,7 @@ class NutrientViewModel(private val nutrientRepository: NutrientRepository) : Vi
             when(val result = safeApiCall { nutrientRepository.getProductInfo(product) }) {
                 is Result.Success -> {
                     _nutrientResult.postValue(result.data.service.result)
-                    if(result.data.service.result.code == "INFO-000") {
+                    if(result.data.service.result.code == NutrientConst.SUCCESS) {
                         _nutrientRepositories.postValue(result.data.service.row)
                     }
                 }
