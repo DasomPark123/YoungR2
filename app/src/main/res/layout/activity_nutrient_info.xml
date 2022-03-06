@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="nutrient"
+            type="com.example.youngr2.models.NutrientRowModel" />
     </data>
 
     <LinearLayout
@@ -14,32 +16,78 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_white_radius_8"
+            android:layout_height="match_parent"
             android:orientation="vertical"
+            android:background="@drawable/bg_white_radius_8"
             android:layout_margin="10dp">
-
-            <TextView
-                style="@style/col_black_16_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Product" />
-
-            <TextView
-                style="@style/col_b5b5b5b5_12_font"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Company"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:layout_margin="10dp">
 
-                <ImageView
-                    android:layout_width="0dp"
+                <TextView
+                    style="@style/col_black_16_bold"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:text="@{nutrient.product}" />
+
+                <TextView
+                    style="@style/col_b5b5b5b5_12_font"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{nutrient.maker}"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/col_caae53_14_font"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{@string/total_content(nutrient.total_content)}"/>
+
+                        <TextView
+                            style="@style/col_black_16_bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{@string/kcal(nutrient.calorie)}"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/col_caae53_16_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sub_title"
+                android:padding="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="15dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -48,124 +96,110 @@
                     android:orientation="vertical">
 
                     <TextView
-                        style="@style/col_caae53_14_font"
+                        style="@style/col_b5b5b5b5_14_font"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:text="@string/carbohydrate"/>
 
                     <TextView
                         style="@style/col_black_16_bold"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/g(nutrient.carbohydrate)}"/>
+
+                    <TextView
+                        style="@style/col_b5b5b5b5_14_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fat"/>
+
+                    <TextView
+                        style="@style/col_black_16_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/g(nutrient.fat)}"/>
+
+                    <TextView
+                        style="@style/col_b5b5b5b5_14_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/salts"/>
+
+                    <TextView
+                        style="@style/col_black_16_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/mg(nutrient.salt)}"/>
+
+                    <TextView
+                        style="@style/col_b5b5b5b5_14_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/saturated_fatty_acids"/>
+
+                    <TextView
+                        style="@style/col_black_16_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/g(nutrient.saturated_fatty_acids)}"/>
+
                 </LinearLayout>
 
-            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-        </LinearLayout>
+                    <TextView
+                        style="@style/col_b5b5b5b5_14_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/protein"/>
 
-        <TextView
-            style="@style/col_caae53_14_font"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+                    <TextView
+                        style="@style/col_black_16_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/g(nutrient.protein)}"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+                    <TextView
+                        style="@style/col_b5b5b5b5_14_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sugars"/>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                    <TextView
+                        style="@style/col_black_16_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/g(nutrient.sugars)}"/>
 
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        style="@style/col_b5b5b5b5_14_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cholesterol"/>
 
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        style="@style/col_black_16_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/mg(nutrient.cholesterol)}"/>
 
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        style="@style/col_b5b5b5b5_14_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/trans_fats"/>
 
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        style="@style/col_black_16_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/g(nutrient.cholesterol)}"/>
 
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_b5b5b5b5_14_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    style="@style/col_black_12_font"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                </LinearLayout>
 
             </LinearLayout>
 

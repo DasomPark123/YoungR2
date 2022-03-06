@@ -5,11 +5,29 @@
     <string name="search_by_category">종류별 찾기</string>
     <string name="search_by_barcode">바코드로 찾기</string>
 
-    <!--Product List-->
+    <!-- Product List -->
     <string name="no_data">검색한 상품이 존재하지 않습니다.</string>
+    <string name="carbohydrate">탄수화물(g)</string>
+    <string name="protein">단백질(g)</string>
+    <string name="fat">지방(g)</string>
+    <string name="sugars">당류(g)</string>
+    <string name="salts">나트륨(mg)</string>
+    <string name="cholesterol">콜레스테롤(mg)</string>
+    <string name="saturated_fatty_acids">포화지방산(g)</string>
+    <string name="trans_fats">트랜스지방(g)</string>
+
+    <!-- Product Info -->
+    <string name="sub_title">영양 성분 (1회 제공량당)</string>
+    <string name="total_content">총 내용량 %sG</string>
+    <string name="kcal">%sKcal</string>
+    <string name="g">%sg</string>
+    <string name="mg">%smg</string>
 
     <!-- snackbar -->
     <string name="request_input_text">식품이름을 검색해 주세요.</string>
     <!-- progressbar -->
     <string name="please_wait">잠시만 기다려주세요...</string>
+    <!-- Alert dialog -->
+    <string name="notification">Notification</string>
+    <string name="ok">확인</string>
 </resources>

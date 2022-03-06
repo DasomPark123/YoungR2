@@ -18,11 +18,16 @@ class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.
 
     override fun initView() {
         super.initView()
-        val actionBar = supportActionBar
-        actionBar?.let {  actionBar.setDisplayHomeAsUpEnabled(true)
-            intent?.let { actionBar.title = intent.getStringExtra(NutrientApplication.EXTRA_PRODUCT)
-            }
-        }
+//        val actionBar = supportActionBar
+//        actionBar?.let {  actionBar.setDisplayHomeAsUpEnabled(true)
+//            intent?.let { actionBar.title = intent.getStringExtra(NutrientApplication.EXTRA_PRODUCT)
+//            }
+//        }
+    }
+
+    override fun afterOnCreate() {
+        super.afterOnCreate()
+        binding.nutrient = intent.getParcelableExtra(NutrientApplication.EXTRA_PRODUCT_DATA)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

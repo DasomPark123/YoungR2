@@ -1,5 +1,6 @@
 package com.example.youngr2
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -24,6 +25,8 @@ class NutrientListActivity :
     private lateinit var nutrientAdapter: NutrientAdapter
 
     private lateinit var product: String
+
+    private lateinit var dataList : List<NutrientRowModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +56,7 @@ class NutrientListActivity :
         /* Nutrient data observing */
         viewModel.nutrientRepositories.observe(this) {
             updateRepositories(it)
+            dataList = it
         }
         /* Result observing */
         viewModel.nutrientResult.observe(this) {
@@ -69,8 +73,7 @@ class NutrientListActivity :
     /* Invoked from onCreate() in BaseActivity */
     override fun afterOnCreate() {
         super.afterOnCreate()
-        product = intent.getStringExtra(NutrientApplication.EXTRA_PRODUCT)!!
-        requestProductList(product)
+        intent.getStringExtra(NutrientApplication.EXTRA_PRODUCT)!!.run { requestProductList(this) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -91,7 +94,9 @@ class NutrientListActivity :
                 clickListener = object : NutrientAdapter.OnNutrientClickListener {
                     override fun onItemClick(position: Int) {
                         nutrientAdapter.getItem(position).run {
-                            //TODO : Nutrient Activity 로 이동
+                            Intent(this@NutrientListActivity, NutrientInfoActivity::class.java).apply {
+                                putExtra(NutrientApplication.EXTRA_PRODUCT_DATA, dataList[position])
+                            }.run { startActivity(this) }
                         }
                     }
                 }
@@ -121,7 +126,7 @@ class NutrientListActivity :
                 }
             }
             else -> {
-                showSnackBar(binding.llNutrientList, result.msg)
+                showAlertDialog(getString(R.string.notification), result.msg)
             }
         }
     }

@@ -1,7 +1,9 @@
 package com.example.youngr2.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 
+@kotlinx.parcelize.Parcelize
 data class NutrientRowModel(
     @SerializedName("NUM")
     val num : String,
@@ -65,4 +67,4 @@ data class NutrientRowModel(
 
     @SerializedName("NUTR_CONT9")
     val trans_fat : String
-)
+) : Parcelable
