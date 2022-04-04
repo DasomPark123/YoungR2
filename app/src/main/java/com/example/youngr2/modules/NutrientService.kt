@@ -1,6 +1,6 @@
 package com.example.youngr2.modules
 
-import com.example.youngr2.interfaces.NutrientApi
+import com.example.youngr2.api.NutrientApi
 
 object NutrientService : BaseService() {
     const val NUTRIENT_URL = "https://openapi.foodsafetykorea.go.kr"

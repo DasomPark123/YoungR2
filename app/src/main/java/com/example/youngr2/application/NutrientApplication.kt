@@ -8,6 +8,7 @@ class NutrientApplication : Application() {
         lateinit var INSTANCE : NutrientApplication
         const val EXTRA_PRODUCT : String = "EXTRA_PRODUCT"
         const val EXTRA_PRODUCT_DATA : String = "EXTRA_PRODUCT_DATA"
+
     }
 
     init {

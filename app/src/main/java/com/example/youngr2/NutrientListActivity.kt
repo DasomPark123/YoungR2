@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youngr2.adapter.NutrientAdapter
 import com.example.youngr2.application.NutrientApplication
@@ -13,8 +14,12 @@ import com.example.youngr2.databinding.ActivityNutrientListBinding
 import com.example.youngr2.factory.NutrientViewModelFactory
 import com.example.youngr2.models.NutrientResultModel
 import com.example.youngr2.models.NutrientRowModel
+import com.example.youngr2.modules.NutrientService
 import com.example.youngr2.repositories.NutrientRepository
 import com.example.youngr2.viewmodels.NutrientViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class NutrientListActivity :
     BaseActivity<ActivityNutrientListBinding>(R.layout.activity_nutrient_list) {
@@ -28,6 +33,8 @@ class NutrientListActivity :
 
     private lateinit var dataList : List<NutrientRowModel>
 
+    private var searchJob : Job? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -39,41 +46,57 @@ class NutrientListActivity :
 
     override fun initView() {
         super.initView()
+        // Init action bar
         val actionBar = supportActionBar
         actionBar?.let {
-            actionBar!!.setDisplayHomeAsUpEnabled(true)
+            actionBar.setDisplayHomeAsUpEnabled(true)
             intent?.let {
                 actionBar.title = intent.getStringExtra(NutrientApplication.EXTRA_PRODUCT)
             }
+        }
+
+        // Init adapter
+        nutrientAdapter = NutrientAdapter().apply {
+            clickListener = object : NutrientAdapter.OnNutrientClickListener {
+                override fun onItemClick(position: Int) {
+                    Log.d(tag, "clicked item : $position")
+                }
+
+            }
+        }
+        binding.rvNutrients.run {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(this@NutrientListActivity)
+            adapter = nutrientAdapter
         }
     }
 
     /* Invoked from onCreate() in BaseActivity */
     override fun initViewModel() {
         super.initViewModel()
-        viewModelFactory = NutrientViewModelFactory(NutrientRepository())
+        viewModelFactory = NutrientViewModelFactory(NutrientRepository(NutrientService.client!!))
         viewModel = ViewModelProvider(this, viewModelFactory).get(NutrientViewModel::class.java)
-        /* Nutrient data observing */
-        viewModel.nutrientRepositories.observe(this) {
-            updateRepositories(it)
-            dataList = it
-        }
-        /* Result observing */
-        viewModel.nutrientResult.observe(this) {
-            progressBar.dismiss()
-            updateResult(it)
-        }
-        /* Error observing */
-        viewModel.nutrientError.observe(this) {
-            progressBar.dismiss()
-            showSnackBar(binding.llNutrientList, it)
-        }
+//        /* Nutrient data observing */
+//        viewModel.nutrientRepositories.observe(this) {
+//            updateRepositories(it)
+//            dataList = it
+//        }
+//        /* Result observing */
+//        viewModel.nutrientResult.observe(this) {
+//            progressBar.dismiss()
+//            updateResult(it)
+//        }
+//        /* Error observing */
+//        viewModel.nutrientError.observe(this) {
+//            progressBar.dismiss()
+//            showSnackBar(binding.llNutrientList, it)
+//        }
     }
 
     /* Invoked from onCreate() in BaseActivity */
     override fun afterOnCreate() {
         super.afterOnCreate()
-        intent.getStringExtra(NutrientApplication.EXTRA_PRODUCT)!!.run { requestProductList(this) }
+        intent.getStringExtra(NutrientApplication.EXTRA_PRODUCT)!!.run { searchNutrientInfo(this) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -86,33 +109,44 @@ class NutrientListActivity :
         return super.onOptionsItemSelected(item)
     }
 
-    private fun updateRepositories(repos: List<NutrientRowModel>) {
-        if (::nutrientAdapter.isInitialized) {
-            nutrientAdapter.update(repos)
-        } else {
-            nutrientAdapter = NutrientAdapter(repos).apply {
-                clickListener = object : NutrientAdapter.OnNutrientClickListener {
-                    override fun onItemClick(position: Int) {
-                        nutrientAdapter.getItem(position).run {
-                            Intent(this@NutrientListActivity, NutrientInfoActivity::class.java).apply {
-                                putExtra(NutrientApplication.EXTRA_PRODUCT_DATA, dataList[position])
-                            }.run { startActivity(this) }
-                        }
-                    }
+    private fun searchNutrientInfo(product: String) {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            viewModel.requestNutrientInfo(product).collectLatest {
+                if(::nutrientAdapter.isInitialized) {
+                    nutrientAdapter.submitData(it)
                 }
-            }
-            binding.rvNutrients.run {
-                setHasFixedSize(true)
-                layoutManager = LinearLayoutManager(this@NutrientListActivity)
-                adapter = nutrientAdapter
             }
         }
     }
 
-    private fun requestProductList(product: String) {
-        showProgressDialog()
-        viewModel.requestNutrientRepositories(product)
-    }
+//    private fun updateRepositories(repos: List<NutrientRowModel>) {
+//        if (::nutrientAdapter.isInitialized) {
+//            nutrientAdapter.update(repos)
+//        } else {
+//            nutrientAdapter = NutrientAdapter(repos).apply {
+//                clickListener = object : NutrientAdapter.OnNutrientClickListener {
+//                    override fun onItemClick(position: Int) {
+//                        nutrientAdapter.getItem(position).run {
+//                            Intent(this@NutrientListActivity, NutrientInfoActivity::class.java).apply {
+//                                putExtra(NutrientApplication.EXTRA_PRODUCT_DATA, dataList[position])
+//                            }.run { startActivity(this) }
+//                        }
+//                    }
+//                }
+//            }
+//            binding.rvNutrients.run {
+//                setHasFixedSize(true)
+//                layoutManager = LinearLayoutManager(this@NutrientListActivity)
+//                adapter = nutrientAdapter
+//            }
+//        }
+//    }
+//
+//    private fun requestProductList(product: String) {
+//        showProgressDialog()
+//        viewModel.requestNutrientRepositories(product)
+//    }
 
     private fun updateResult(result: NutrientResultModel) {
         when(result.code) {
