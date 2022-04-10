@@ -6,6 +6,8 @@
     <string name="search_by_barcode">바코드로 찾기</string>
 
     <!-- Product List -->
+    <string name="data_road_error">데이터를 불러오는데 문제가 발생하였습니다.</string>
+    <string name="reload_data"><u>다시 시도</u></string>
     <string name="no_data">검색한 상품이 존재하지 않습니다.</string>
     <string name="carbohydrate">탄수화물(g)</string>
     <string name="protein">단백질(g)</string>

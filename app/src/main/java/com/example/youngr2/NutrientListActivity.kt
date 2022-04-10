@@ -5,9 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.youngr2.adapter.LoadingStateAdapter
 import com.example.youngr2.adapter.NutrientAdapter
 import com.example.youngr2.application.NutrientApplication
 import com.example.youngr2.databinding.ActivityNutrientListBinding
@@ -29,11 +32,7 @@ class NutrientListActivity :
     private lateinit var viewModelFactory: NutrientViewModelFactory
     private lateinit var nutrientAdapter: NutrientAdapter
 
-    private lateinit var product: String
-
-    private lateinit var dataList : List<NutrientRowModel>
-
-    private var searchJob : Job? = null
+    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,13 +60,37 @@ class NutrientListActivity :
                 override fun onItemClick(position: Int) {
                     Log.d(tag, "clicked item : $position")
                 }
+            }
+            addLoadStateListener { combinedLoadStates ->
+                binding.apply {
+                    /* 로딩 중 */
+                    linearProgress.isVisible = combinedLoadStates.source.refresh is LoadState.Loading
+                    /* 로딩중 X, 에러 X */
+                    rvNutrients.isVisible = combinedLoadStates.source.refresh is LoadState.NotLoading
+                    /* 에러 발생 시 */
+                    linearError.isVisible = combinedLoadStates.source.refresh is LoadState.Error
+                    tvReload.setOnClickListener { nutrientAdapter.retry() }
 
+                    /* 로딩 X, 에러 X, 데이터가 없을 경우 */
+                    if(combinedLoadStates.source.refresh is LoadState.NotLoading
+                        && combinedLoadStates.append.endOfPaginationReached
+                        && nutrientAdapter.itemCount < 1) {
+                        rvNutrients.isVisible = false
+                        tvNoData.isVisible = true
+                    } else {
+                        tvNoData.isVisible = false
+                    }
+                }
             }
         }
-        binding.rvNutrients.run {
+
+        binding.rvNutrients.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@NutrientListActivity)
-            adapter = nutrientAdapter
+            adapter = nutrientAdapter.withLoadStateHeaderAndFooter(
+                header = LoadingStateAdapter { nutrientAdapter.retry() },
+                footer = LoadingStateAdapter { nutrientAdapter.retry() }
+            )
         }
     }
 
@@ -76,21 +99,6 @@ class NutrientListActivity :
         super.initViewModel()
         viewModelFactory = NutrientViewModelFactory(NutrientRepository(NutrientService.client!!))
         viewModel = ViewModelProvider(this, viewModelFactory).get(NutrientViewModel::class.java)
-//        /* Nutrient data observing */
-//        viewModel.nutrientRepositories.observe(this) {
-//            updateRepositories(it)
-//            dataList = it
-//        }
-//        /* Result observing */
-//        viewModel.nutrientResult.observe(this) {
-//            progressBar.dismiss()
-//            updateResult(it)
-//        }
-//        /* Error observing */
-//        viewModel.nutrientError.observe(this) {
-//            progressBar.dismiss()
-//            showSnackBar(binding.llNutrientList, it)
-//        }
     }
 
     /* Invoked from onCreate() in BaseActivity */
@@ -113,50 +121,22 @@ class NutrientListActivity :
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
             viewModel.requestNutrientInfo(product).collectLatest {
-                if(::nutrientAdapter.isInitialized) {
+                if (::nutrientAdapter.isInitialized) {
                     nutrientAdapter.submitData(it)
                 }
             }
         }
     }
 
-//    private fun updateRepositories(repos: List<NutrientRowModel>) {
-//        if (::nutrientAdapter.isInitialized) {
-//            nutrientAdapter.update(repos)
-//        } else {
-//            nutrientAdapter = NutrientAdapter(repos).apply {
-//                clickListener = object : NutrientAdapter.OnNutrientClickListener {
-//                    override fun onItemClick(position: Int) {
-//                        nutrientAdapter.getItem(position).run {
-//                            Intent(this@NutrientListActivity, NutrientInfoActivity::class.java).apply {
-//                                putExtra(NutrientApplication.EXTRA_PRODUCT_DATA, dataList[position])
-//                            }.run { startActivity(this) }
-//                        }
-//                    }
-//                }
-//            }
-//            binding.rvNutrients.run {
-//                setHasFixedSize(true)
-//                layoutManager = LinearLayoutManager(this@NutrientListActivity)
-//                adapter = nutrientAdapter
-//            }
-//        }
-//    }
-//
-//    private fun requestProductList(product: String) {
-//        showProgressDialog()
-//        viewModel.requestNutrientRepositories(product)
-//    }
-
     private fun updateResult(result: NutrientResultModel) {
-        when(result.code) {
+        when (result.code) {
             NutrientConst.SUCCESS -> {
-                Log.d(tag,result.msg)
+                Log.d(tag, result.msg)
             }
             NutrientConst.NO_DATA -> {
                 binding.apply {
                     rvNutrients.visibility = View.GONE
-                    tvNoData.visibility= View.VISIBLE
+                    tvNoData.visibility = View.VISIBLE
                 }
             }
             else -> {

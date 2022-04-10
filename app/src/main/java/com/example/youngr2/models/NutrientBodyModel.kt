@@ -7,7 +7,7 @@ data class NutrientBodyModel(
     val total_count : Int,
 
     @SerializedName("row")
-    val row : List<NutrientRowModel>,
+    var row : List<NutrientRowModel>,
 
     @SerializedName("RESULT")
     val result : NutrientResultModel
