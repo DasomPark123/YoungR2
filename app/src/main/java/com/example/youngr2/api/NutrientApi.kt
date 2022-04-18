@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface NutrientApi {
-    @GET("/api/I2790/json/{startIdx}/{endIdx}/DESC_KOR={product}")
+    @GET("/api/44274ed25eb24761ac70/I2790/json/{startIdx}/{endIdx}/DESC_KOR={product}")
     suspend fun getProductInfo(
         @Path("product") product : String,
         @Path("startIdx") startIdx : Int,

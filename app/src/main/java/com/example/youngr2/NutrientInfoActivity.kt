@@ -2,7 +2,7 @@ package com.example.youngr2
 
 import android.os.Bundle
 import android.view.MenuItem
-import com.example.youngr2.application.NutrientApplication
+import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityNutrientInfoBinding
 
 class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.activity_nutrient_info) {
@@ -25,9 +25,13 @@ class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.
 //        }
     }
 
+    override fun initViewModel() {
+        super.initViewModel()
+    }
+
     override fun afterOnCreate() {
         super.afterOnCreate()
-        binding.nutrient = intent.getParcelableExtra(NutrientApplication.EXTRA_PRODUCT_DATA)
+        binding.nutrient = intent.getParcelableExtra(CustomApplication.EXTRA_PRODUCT_DATA)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

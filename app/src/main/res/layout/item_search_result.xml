@@ -3,42 +3,54 @@
 
     <data>
         <variable
-            name="nutrient"
-            type="com.example.youngr2.models.NutrientRowModel" />
+            name="productInfo"
+            type="com.example.youngr2.models.ProductListItemModel" />
     </data>
 
     <LinearLayout
         android:id="@+id/ll_search_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:background="@drawable/bg_white_radius_8"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="5dp">
 
-        <TextView
-            style="@style/col_black_14_bold"
-            android:id="@+id/tv_product"
+        <ImageView
+            android:id="@+id/iv_product"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="5dp"
-            android:text="@{nutrient.product}"/>
+            android:layout_height="wrap_content"/>
 
-        <TextView
-            style="@style/col_717171_11_font"
-            android:id="@+id/tv_maker"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="10dp"
-            android:text="@{nutrient.maker}"/>
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/col_black_14_bold"
+                android:id="@+id/tv_product"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="5dp"
+                android:text="@{productInfo.prdlstNm}"/>
+
+            <TextView
+                style="@style/col_717171_11_font"
+                android:id="@+id/tv_maker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="10dp"
+                android:text="@{productInfo.manufacture}"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

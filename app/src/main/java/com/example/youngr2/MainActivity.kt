@@ -4,10 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import com.example.youngr2.application.NutrientApplication
+import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityMainBinding
 import com.example.youngr2.utils.Utils
-import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
@@ -44,7 +43,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                         showSnackBar(binding.llMain, getString(R.string.request_input_text))
                     } else {
                         val intent = Intent(this@MainActivity, NutrientListActivity::class.java)
-                        intent.putExtra(NutrientApplication.EXTRA_PRODUCT, product)
+                        intent.putExtra(CustomApplication.EXTRA_PRODUCT, product)
                         startActivity(intent)
                     }
                     handled = true
