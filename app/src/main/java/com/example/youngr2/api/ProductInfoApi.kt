@@ -9,7 +9,7 @@ import retrofit2.http.Query
 
 interface ProductInfoApi {
     @GET("/B553748/CertImgListService/getCertImgListService")
-    suspend fun getProductIInfo(
+    suspend fun getProductInfo(
         @Query("ServiceKey") serviceKey : String = ServiceKeyConst.PRODUCT_INFO_KEY_DECODING,
         @Query("prdlstNm") prdlstNm : String,
         @Query("pageNo") pageNo : String = "1",

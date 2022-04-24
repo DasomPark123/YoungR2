@@ -15,7 +15,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".NutrientListActivity"
+            android:name=".ProductListActivity"
             android:exported="false" />
         <activity
             android:name=".BaseActivity"

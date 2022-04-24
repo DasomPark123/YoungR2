@@ -2,6 +2,7 @@ package com.example.youngr2
 
 import android.os.Bundle
 import android.view.MenuItem
+import com.bumptech.glide.Glide
 import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityNutrientInfoBinding
 
@@ -31,7 +32,14 @@ class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.
 
     override fun afterOnCreate() {
         super.afterOnCreate()
-        binding.nutrient = intent.getParcelableExtra(CustomApplication.EXTRA_PRODUCT_DATA)
+        binding.apply {
+            nutrient = intent.getParcelableExtra(CustomApplication.EXTRA_PRODUCT_DATA)
+            Glide.with(this@NutrientInfoActivity)
+                .load(nutrient?.imageUrl)
+                .error(R.drawable.ic_no_image)
+                .override(800, 800)
+                .into(ivProduct)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

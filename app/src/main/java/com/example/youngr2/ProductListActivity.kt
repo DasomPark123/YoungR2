@@ -13,7 +13,7 @@ import com.example.youngr2.adapter.ProductInfoAdapter
 import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityNutrientListBinding
 import com.example.youngr2.factory.ProductInfoViewModelFactory
-import com.example.youngr2.models.ProductListItemModel
+import com.example.youngr2.models.ParsedProductInfo
 import com.example.youngr2.modules.ProductInfoService
 import com.example.youngr2.repositories.ProductInfoRepository
 import com.example.youngr2.viewmodels.ProductInfoViewModel
@@ -21,7 +21,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class NutrientListActivity :
+class ProductListActivity :
     BaseActivity<ActivityNutrientListBinding>(R.layout.activity_nutrient_list) {
     private val tag = javaClass.simpleName
 
@@ -55,8 +55,8 @@ class NutrientListActivity :
 
         // Init adapter
         productInfoAdapter = ProductInfoAdapter(clickListener = object : ProductInfoAdapter.OnProductClickListener{
-            override fun onItemClick(data: ProductListItemModel) {
-                Intent(this@NutrientListActivity, NutrientInfoActivity::class.java).apply {
+            override fun onItemClick(data: ParsedProductInfo) {
+                Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
                     putExtra(CustomApplication.EXTRA_PRODUCT_DATA, data)
                 }.run { startActivity(this) }
             }
@@ -86,7 +86,7 @@ class NutrientListActivity :
 
         binding.rvNutrients.apply {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(this@NutrientListActivity)
+            layoutManager = LinearLayoutManager(this@ProductListActivity)
             adapter = productInfoAdapter.withLoadStateHeaderAndFooter(
                 header = LoadingStateAdapter { productInfoAdapter.retry() },
                 footer = LoadingStateAdapter { productInfoAdapter.retry() }

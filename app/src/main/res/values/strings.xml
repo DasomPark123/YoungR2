@@ -9,14 +9,14 @@
     <string name="data_road_error">데이터를 불러오는데 문제가 발생하였습니다.</string>
     <string name="reload_data"><u>다시 시도</u></string>
     <string name="no_data">검색한 상품이 존재하지 않습니다.</string>
-    <string name="carbohydrate">탄수화물(g)</string>
-    <string name="protein">단백질(g)</string>
-    <string name="fat">지방(g)</string>
-    <string name="sugars">당류(g)</string>
-    <string name="salts">나트륨(mg)</string>
-    <string name="cholesterol">콜레스테롤(mg)</string>
-    <string name="saturated_fatty_acids">포화지방산(g)</string>
-    <string name="trans_fats">트랜스지방(g)</string>
+    <string name="carbohydrate">탄수화물</string>
+    <string name="protein">단백질</string>
+    <string name="fat">지방</string>
+    <string name="sugars">당류</string>
+    <string name="salts">나트륨</string>
+    <string name="cholesterol">콜레스테롤</string>
+    <string name="saturated_fatty_acids">포화지방산</string>
+    <string name="trans_fats">트랜스지방</string>
 
     <!-- Product Info -->
     <string name="sub_title">영양 성분 (1회 제공량당)</string>

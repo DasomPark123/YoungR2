@@ -42,7 +42,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                         utils.hideKeyboard(v)
                         showSnackBar(binding.llMain, getString(R.string.request_input_text))
                     } else {
-                        val intent = Intent(this@MainActivity, NutrientListActivity::class.java)
+                        val intent = Intent(this@MainActivity, ProductListActivity::class.java)
                         intent.putExtra(CustomApplication.EXTRA_PRODUCT, product)
                         startActivity(intent)
                     }

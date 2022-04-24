@@ -6,12 +6,13 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.example.youngr2.databinding.ItemSearchResultBinding
 import com.example.youngr2.holder.ProductInfoViewHolder
+import com.example.youngr2.models.ParsedProductInfo
 import com.example.youngr2.models.ProductListItemModel
 
-class ProductInfoAdapter(private val clickListener: OnProductClickListener) : PagingDataAdapter<ProductListItemModel, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
+class ProductInfoAdapter(private val clickListener: OnProductClickListener) : PagingDataAdapter<ParsedProductInfo, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
 
     interface OnProductClickListener {
-        fun onItemClick(data : ProductListItemModel)
+        fun onItemClick(data : ParsedProductInfo)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductInfoViewHolder {
@@ -25,15 +26,15 @@ class ProductInfoAdapter(private val clickListener: OnProductClickListener) : Pa
         item?.let {  holder.bind(item) }
     }
     companion object {
-        private val PRODUCT_INFO_COMPARATOR = object : DiffUtil.ItemCallback<ProductListItemModel>() {
+        private val PRODUCT_INFO_COMPARATOR = object : DiffUtil.ItemCallback<ParsedProductInfo>() {
             override fun areItemsTheSame(
-                oldItem: ProductListItemModel,
-                newItem: ProductListItemModel
-            ): Boolean = oldItem.prdlstReportNo == newItem.prdlstReportNo
+                oldItem: ParsedProductInfo,
+                newItem: ParsedProductInfo
+            ): Boolean = oldItem.productId == newItem.productId
 
             override fun areContentsTheSame(
-                oldItem: ProductListItemModel,
-                newItem: ProductListItemModel
+                oldItem: ParsedProductInfo,
+                newItem: ParsedProductInfo
             ): Boolean = oldItem == newItem
         }
     }
