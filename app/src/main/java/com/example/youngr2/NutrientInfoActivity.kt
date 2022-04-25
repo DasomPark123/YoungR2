@@ -1,12 +1,15 @@
 package com.example.youngr2
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import com.bumptech.glide.Glide
 import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityNutrientInfoBinding
 
 class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.activity_nutrient_info) {
+
+    private val tag = javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +37,7 @@ class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.
         super.afterOnCreate()
         binding.apply {
             nutrient = intent.getParcelableExtra(CustomApplication.EXTRA_PRODUCT_DATA)
+            Log.d(tag, "data : $nutrient")
             Glide.with(this@NutrientInfoActivity)
                 .load(nutrient?.imageUrl)
                 .error(R.drawable.ic_no_image)
