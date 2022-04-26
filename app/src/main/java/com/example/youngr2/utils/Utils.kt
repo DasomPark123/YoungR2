@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import java.util.regex.Pattern
 
 class Utils(private val context: Context) {
 
@@ -19,6 +20,17 @@ class Utils(private val context: Context) {
         fun removeKorean(str: String): String {
             val regex = "[\\uAC00-\\uD7A3]".toRegex()
             return str.replace(regex, "")
+        }
+
+        fun findWordBetweenBracket(str : String) : String {
+            var word : String? = ""
+            val pattern = Pattern.compile("[(](.*?)[)]")
+            val matcher = pattern.matcher(str)
+            while (matcher.find()) {
+                word = matcher.group(1)
+                if (word == null) break
+            }
+            return word ?: ""
         }
     }
 }

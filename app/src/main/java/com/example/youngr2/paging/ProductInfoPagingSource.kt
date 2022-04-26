@@ -82,7 +82,13 @@ class ProductInfoPagingSource(
             parsedProductInfo.seller =
                 productInfo.manufacture.split(" ")[0].split("/")[0].split("_")[0]
             parsedProductInfo.imageUrl = productInfo.imgurl1
-            parsedProductInfo.calorie = productInfo.capacity
+            if (productInfo.capacity.contains("(")) {
+                parsedProductInfo.total_content =
+                    productInfo.capacity.substring(0, productInfo.capacity.indexOf("("))
+                parsedProductInfo.calorie = Utils.findWordBetweenBracket(productInfo.capacity)
+            } else {
+                parsedProductInfo.total_content = productInfo.capacity
+            }
 
             if (productInfo.nutrient != null && productInfo.nutrient != NutrientConst.UNKNOWN) {
                 val nutrientArr = productInfo.nutrient.split(",")
@@ -90,15 +96,17 @@ class ProductInfoPagingSource(
                     if (nutrientArr[i].contains(NutrientConst.CALORIE)) {
                         if (!parsedProductInfo.calorie.contains(NutrientConst.CALORIE)) {
                             val calArr = nutrientArr[i].split(" ")
-                            for (word in calArr) {
-                                if (word.contains("kcal")) {
-                                        parsedProductInfo.calorie = parsedProductInfo.calorie + "(" + Utils.removeKorean(word)
-                                            .substring(
-                                                0,
-                                                Utils.removeKorean(word)
-                                                    .indexOf(NutrientConst.CALORIE) + 4
-                                            ) + ")"
-
+                            for (i in calArr.indices) {
+                                if (calArr[i].contains("kcal")) {
+                                    if (calArr[i].length == 4 && i != 0) { // ex) 250 kcal : 숫자와 kcal 사이에 띄어쓰기가 있는 경우
+                                        parsedProductInfo.calorie =
+                                            Utils.removeKorean(calArr[i - 1]) + Utils.removeKorean(calArr[i])
+                                    } else if (calArr[i].contains("(") && calArr[i].contains(")")) { // ex) 열량(kcal)350 : kcal 이 괄호안에 있는 경우
+                                        parsedProductInfo.calorie = calArr[i]
+                                    } else {
+                                        parsedProductInfo.calorie = Utils.removeKorean(calArr[i]).substring(0, Utils.removeKorean(calArr[i])
+                                                    .indexOf(NutrientConst.CALORIE) + 4)
+                                    }
                                     break
                                 }
                             }
