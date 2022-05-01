@@ -26,9 +26,10 @@ class ProductListActivity :
     private val tag = javaClass.simpleName
 
     private lateinit var viewModel: ProductInfoViewModel
-//    private lateinit var viewModelFactory: NutrientViewModelFactory
+
+    //    private lateinit var viewModelFactory: NutrientViewModelFactory
     private lateinit var productInfoAdapter: ProductInfoAdapter
-    private lateinit var viewModelFactory : ProductInfoViewModelFactory
+    private lateinit var viewModelFactory: ProductInfoViewModelFactory
 
 
     private var searchJob: Job? = null
@@ -54,35 +55,39 @@ class ProductListActivity :
         }
 
         // Init adapter
-        productInfoAdapter = ProductInfoAdapter(clickListener = object : ProductInfoAdapter.OnProductClickListener{
-            override fun onItemClick(data: ParsedProductInfo) {
-                Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
-                    putExtra(CustomApplication.EXTRA_PRODUCT_DATA, data)
-                }.run { startActivity(this) }
-            }
-        }).apply {
-            addLoadStateListener { combinedLoadStates ->
-                binding.apply {
-                    /* 로딩 중 */
-                    linearProgress.isVisible = combinedLoadStates.source.refresh is LoadState.Loading
-                    /* 로딩중 X, 에러 X */
-                    rvNutrients.isVisible = combinedLoadStates.source.refresh is LoadState.NotLoading
-                    /* 에러 발생 시 */
-                    linearError.isVisible = combinedLoadStates.source.refresh is LoadState.Error
-                    tvReload.setOnClickListener { productInfoAdapter.retry() }
+        productInfoAdapter =
+            ProductInfoAdapter(clickListener = object : ProductInfoAdapter.OnProductClickListener {
+                override fun onItemClick(data: ParsedProductInfo) {
+                    Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
+                        putExtra(CustomApplication.EXTRA_PRODUCT_DATA, data)
+                    }.run { startActivity(this) }
+                }
+            }).apply {
+                addLoadStateListener { combinedLoadStates ->
+                    binding.apply {
+                        /* 로딩 중 */
+                        linearProgress.isVisible =
+                            combinedLoadStates.source.refresh is LoadState.Loading
+                        /* 로딩중 X, 에러 X */
+                        rvNutrients.isVisible =
+                            combinedLoadStates.source.refresh is LoadState.NotLoading
+                        /* 에러 발생 시 */
+                        linearError.isVisible = combinedLoadStates.source.refresh is LoadState.Error
+                        tvReload.setOnClickListener { productInfoAdapter.retry() }
 
-                    /* 로딩 X, 에러 X, 데이터가 없을 경우 */
-                    if(combinedLoadStates.source.refresh is LoadState.NotLoading
-                        && combinedLoadStates.append.endOfPaginationReached
-                        && productInfoAdapter.itemCount < 1) {
-                        rvNutrients.isVisible = false
-                        tvNoData.isVisible = true
-                    } else {
-                        tvNoData.isVisible = false
+                        /* 로딩 X, 에러 X, 데이터가 없을 경우 */
+                        if (combinedLoadStates.source.refresh is LoadState.NotLoading
+                            && combinedLoadStates.append.endOfPaginationReached
+                            && productInfoAdapter.itemCount < 1
+                        ) {
+                            rvNutrients.isVisible = false
+                            tvNoData.isVisible = true
+                        } else {
+                            tvNoData.isVisible = false
+                        }
                     }
                 }
             }
-        }
 
         binding.rvNutrients.apply {
             setHasFixedSize(true)
@@ -98,14 +103,15 @@ class ProductListActivity :
     override fun initViewModel() {
         super.initViewModel()
         //viewModelFactory = NutrientViewModelFactory(NutrientRepository(NutrientService.client!!))
-        viewModelFactory = ProductInfoViewModelFactory(ProductInfoRepository(ProductInfoService.client!!))
+        viewModelFactory =
+            ProductInfoViewModelFactory(ProductInfoRepository(ProductInfoService.client!!))
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProductInfoViewModel::class.java)
     }
 
     /* Invoked from onCreate() in BaseActivity */
     override fun afterOnCreate() {
         super.afterOnCreate()
-        intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)!!.run { searchProductInfo(this) }
+        intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)?.let { searchProductInfo(it) } ?: run { searchAllProductInfo() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -122,7 +128,18 @@ class ProductListActivity :
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
             viewModel.requestProductInfo(product).collectLatest {
-                if(::productInfoAdapter.isInitialized) {
+                if (::productInfoAdapter.isInitialized) {
+                    productInfoAdapter.submitData(it)
+                }
+            }
+        }
+    }
+
+    private fun searchAllProductInfo() {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            viewModel.requestAllProductInfo().collectLatest {
+                if (::productInfoAdapter.isInitialized) {
                     productInfoAdapter.submitData(it)
                 }
             }

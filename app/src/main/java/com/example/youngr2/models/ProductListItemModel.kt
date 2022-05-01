@@ -8,48 +8,49 @@ import kotlinx.parcelize.Parcelize
 data class ProductListItemModel(
 
     @SerializedName("allergy")
-    val allergy: String,
+    val allergy: String?,
 
     @SerializedName("barcode")
-    val barcode: String,
+    val barcode: String?,
 
     @SerializedName("capacity")
-    val capacity: String,
+    val capacity: String?,
 
     @SerializedName("imgurl1")
-    val imgurl1: String,
+    val imgurl1: String?,
 
     @SerializedName("imgurl2")
-    val imgurl2: String,
+    val imgurl2: String?,
 
     @SerializedName("manufacture")
-    val manufacture: String,
+    val manufacture: String?,
 
     @SerializedName("nutrient")
-    val nutrient: String,
+    val nutrient: String?,
 
     @SerializedName("prdkind")
-    val prdkind: String,
+    val prdkind: String?,
 
     @SerializedName("prdkindstate")
-    val prdkindstate: String,
+    val prdkindstate: String?,
 
     @SerializedName("prdlstNm")
-    val prdlstNm: String,
+    val prdlstNm: String?,
 
     @SerializedName("prdlstReportNo")
-    val prdlstReportNo: String,
+    val prdlstReportNo: String?,
 
     @SerializedName("productGb")
-    val productGb: String,
+    val productGb: String?,
 
     @SerializedName("rawmtrl")
-    val rawmtrl: String,
+    val rawmtrl: String?,
 
     @SerializedName("rnum")
-    val rnum: String,
+    val rnum: String?,
 
     @SerializedName("seller")
-    val seller: String
+    val seller: String?
+
 
 ) : Parcelable

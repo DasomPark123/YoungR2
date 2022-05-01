@@ -24,7 +24,7 @@ abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId
     private val TAG: String = javaClass.simpleName
 
     protected lateinit var binding: T
-    protected lateinit var progressBar: AlertDialog
+    private lateinit var progressBar: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         beforeSetContentView()

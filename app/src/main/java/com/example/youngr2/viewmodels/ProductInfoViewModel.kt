@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.youngr2.models.ParsedProductInfo
-import com.example.youngr2.models.ProductListItemModel
 import com.example.youngr2.repositories.ProductInfoRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -25,5 +24,9 @@ class ProductInfoViewModel(private val productInfoRepository: ProductInfoReposit
         val newResult : Flow<PagingData<ParsedProductInfo>> = productInfoRepository.getProductInfo(product).cachedIn(viewModelScope)
         currentSearchResult = newResult
         return newResult
+    }
+
+    fun requestAllProductInfo(): Flow<PagingData<ParsedProductInfo>> {
+        return productInfoRepository.getProductInfo("").cachedIn(viewModelScope)
     }
 }

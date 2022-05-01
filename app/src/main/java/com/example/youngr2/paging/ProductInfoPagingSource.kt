@@ -37,7 +37,6 @@ class ProductInfoPagingSource(
                 numberOfRows = NETWORK_PAGE_SIZE.toString()
             )
 
-            //Todo : 클래스 하나 만들어서 필요한 데이터만 파싱해서 넣고 리스트로 만들어서 뿌리기,,?
             val dataList = response.body()?.list
             Log.d(tag, "Paging data : $dataList")
             val error = response.errorBody().toString()
@@ -62,7 +61,6 @@ class ProductInfoPagingSource(
         }
     }
 
-
     override fun getRefreshKey(state: PagingState<Int, ParsedProductInfo>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
@@ -77,110 +75,148 @@ class ProductInfoPagingSource(
         val parsedDataList: ArrayList<ParsedProductInfo> = ArrayList()
         for (productInfo in productInfoList) {
             val parsedProductInfo = ParsedProductInfo()
-            parsedProductInfo.productId = productInfo.prdlstReportNo
-            parsedProductInfo.product = productInfo.prdlstNm
-            parsedProductInfo.seller =
-                productInfo.manufacture.split(" ")[0].split("/")[0].split("_")[0]
-            parsedProductInfo.imageUrl = productInfo.imgurl1
-            if (productInfo.capacity.contains("(")) {
-                parsedProductInfo.total_content =
-                    productInfo.capacity.substring(0, productInfo.capacity.indexOf("("))
-                parsedProductInfo.calorie = Utils.findWordBetweenBracket(productInfo.capacity)
-            } else {
-                parsedProductInfo.total_content = productInfo.capacity
+            productInfo.prdlstReportNo?.let {
+                parsedProductInfo.productId = productInfo.prdlstReportNo
             }
+            productInfo.prdlstNm?.let { parsedProductInfo.product = productInfo.prdlstNm }
+            productInfo.manufacture?.let {
+                parsedProductInfo.seller =
+                    productInfo.manufacture.split(" ")[0].split("/")[0].split("_")[0].split(",")[0]
+            }
+            productInfo.imgurl1?.let { parsedProductInfo.imageUrl = productInfo.imgurl1 }
+            productInfo.capacity?.let {
+                if (productInfo.capacity.contains("(")) {
+                    parsedProductInfo.total_content =
+                        productInfo.capacity.substring(0, productInfo.capacity.indexOf("("))
+                    parsedProductInfo.calorie = Utils.findWordBetweenBracket(productInfo.capacity).replace(">","")
+                } else {
+                    parsedProductInfo.total_content = productInfo.capacity.replace(">","")
+                }
+            } ?: continue
 
             if (productInfo.nutrient != null && productInfo.nutrient != NutrientConst.UNKNOWN) {
                 val nutrientArr = productInfo.nutrient.split(",")
                 for (i in nutrientArr.indices) {
-                    if (nutrientArr[i].contains(NutrientConst.CALORIE)) {
-                        if (!parsedProductInfo.calorie.contains(NutrientConst.CALORIE)) {
-                            val calArr = nutrientArr[i].split(" ")
-                            for (i in calArr.indices) {
-                                if (calArr[i].contains("kcal")) {
-                                    if (calArr[i].length == 4 && i != 0) { // ex) 250 kcal : 숫자와 kcal 사이에 띄어쓰기가 있는 경우
-                                        parsedProductInfo.calorie =
-                                            Utils.removeKorean(calArr[i - 1]) + Utils.removeKorean(calArr[i])
-                                    } else if (calArr[i].contains("(") && calArr[i].contains(")")) { // ex) 열량(kcal)350 : kcal 이 괄호안에 있는 경우
-                                        parsedProductInfo.calorie = calArr[i]
-                                    } else {
-                                        parsedProductInfo.calorie = Utils.removeKorean(calArr[i]).substring(0, Utils.removeKorean(calArr[i])
-                                                    .indexOf(NutrientConst.CALORIE) + 4)
+                    when {
+                        nutrientArr[i].contains(NutrientConst.CALORIE) -> {
+                            if (!parsedProductInfo.calorie.contains(NutrientConst.CALORIE)) {
+                                val calArr = nutrientArr[i].split(" ")
+                                for (i in calArr.indices) {
+                                    if (calArr[i].contains("kcal")) {
+                                        when {
+                                            calArr[i].length == 4 && i != 0 -> { // ex) 250 kcal : 숫자와 kcal 사이에 띄어쓰기가 있는 경우
+                                                parsedProductInfo.calorie =
+                                                    (Utils.removeKorean(calArr[i - 1]) + Utils.removeKorean(
+                                                        calArr[i]
+                                                    )).replace(">","")
+                                            }
+                                            calArr[i].contains("(") && calArr[i].contains(")") -> { // ex) 열량(kcal)350 : kcal 이 괄호안에 있는 경우
+                                                parsedProductInfo.calorie = calArr[i].replace(">","")
+                                            }
+                                            else -> {
+                                                parsedProductInfo.calorie =
+                                                    Utils.removeKorean(calArr[i]).substring(
+                                                        0,
+                                                        Utils.removeKorean(calArr[i])
+                                                            .indexOf(NutrientConst.CALORIE) + 4
+                                                    ).replace(">","")
+                                            }
+                                        }
+                                        break
                                     }
-                                    break
                                 }
                             }
                         }
-                    } else if (nutrientArr[i].contains(NutrientConst.CARBOHYDRATE)) {
-                        val carArr = nutrientArr[i].split(" ")
-                        for (word in carArr) {
-                            if (word.contains("g")) {
-                                parsedProductInfo.carbohydrate = Utils.removeKorean(word)
-                                break
-                            }
-                        }
-                    } else if (nutrientArr[i].contains(NutrientConst.SUGAR)) {
-                        val sugarArr = nutrientArr[i].split(" ")
-                        for (word in sugarArr) {
-                            if (word.contains("g")) {
-                                parsedProductInfo.sugars = Utils.removeKorean(word)
-                                break
-                            }
-                        }
-                    } else if (nutrientArr[i].contains(NutrientConst.PROTEIN)) {
-                        val proteinArr = nutrientArr[i].split(" ")
-                        for (word in proteinArr) {
-                            if (word.contains("g")) {
-                                parsedProductInfo.protein = Utils.removeKorean(word)
-                                break
-                            }
-                        }
-                    } else if (nutrientArr[i].contains(NutrientConst.FAT)) {
-                        if (nutrientArr[i].contains(NutrientConst.SATURATED_FAT)) {
-                            val satArr = nutrientArr[i].split(" ")
-                            for (word in satArr) {
+                        nutrientArr[i].contains(NutrientConst.CARBOHYDRATE) -> {
+                            val carArr = nutrientArr[i].split(" ")
+                            for (word in carArr) {
                                 if (word.contains("g")) {
-                                    parsedProductInfo.saturatedFat = Utils.removeKorean(word)
-                                    break
-                                }
-                            }
-                        } else if (nutrientArr[i].contains(NutrientConst.TRANS_FAT)) {
-                            val transArr = nutrientArr[i].split(" ")
-                            for (word in transArr) {
-                                if (word.contains("g")) {
-                                    parsedProductInfo.transFat = Utils.removeKorean(word)
-                                    break
-                                }
-                            }
-                        } else {
-                            val fatArr = nutrientArr[i].split(" ")
-                            for (word in fatArr) {
-                                if (word.contains("g")) {
-                                    parsedProductInfo.fat = Utils.removeKorean(word)
+                                    parsedProductInfo.carbohydrate = Utils.removeKorean(word).replace(">","")
                                     break
                                 }
                             }
                         }
-                    } else if (nutrientArr[i].contains(NutrientConst.CHOLESTEROL)) {
-                        val cholArr = nutrientArr[i].split(" ")
-                        for (word in cholArr) {
-                            if (word.contains("g")) {
-                                parsedProductInfo.cholesterol = Utils.removeKorean(word)
-                                break
+                        nutrientArr[i].contains(NutrientConst.SUGAR) -> {
+                            val sugarArr = nutrientArr[i].split(" ")
+                            for (word in sugarArr) {
+                                if (word.contains("g")) {
+                                    parsedProductInfo.sugars = Utils.removeKorean(word).replace(">","")
+                                    break
+                                }
                             }
                         }
-                    } else if (nutrientArr[i].contains(NutrientConst.SALT)) {
-                        val saltArr = nutrientArr[i].split(" ")
-                        for (word in saltArr) {
-                            if (word.contains("g")) {
-                                parsedProductInfo.salt = Utils.removeKorean(word)
-                                break
+                        nutrientArr[i].contains(NutrientConst.SUGAR) -> {
+                            val sugarArr = nutrientArr[i].split(" ")
+                            for (word in sugarArr) {
+                                if (word.contains("g")) {
+                                    parsedProductInfo.sugars = Utils.removeKorean(word).replace(">","")
+                                    break
+                                }
+                            }
+                        }
+                        nutrientArr[i].contains(NutrientConst.PROTEIN) -> {
+                            val proteinArr = nutrientArr[i].split(" ")
+                            for (word in proteinArr) {
+                                if (word.contains("g")) {
+                                    parsedProductInfo.protein = Utils.removeKorean(word).replace(">","")
+                                    break
+                                }
+                            }
+                        }
+                        nutrientArr[i].contains(NutrientConst.FAT) -> {
+                            when {
+                                nutrientArr[i].contains(NutrientConst.SATURATED_FAT) -> {
+                                    val satArr = nutrientArr[i].split(" ")
+                                    for (word in satArr) {
+                                        if (word.contains("g")) {
+                                            parsedProductInfo.saturatedFat =
+                                                Utils.removeKorean(word).replace(">","")
+                                            break
+                                        }
+                                    }
+                                }
+                                nutrientArr[i].contains(NutrientConst.TRANS_FAT) -> {
+                                    val transArr = nutrientArr[i].split(" ")
+                                    for (word in transArr) {
+                                        if (word.contains("g")) {
+                                            parsedProductInfo.transFat = Utils.removeKorean(word).replace(">","")
+                                            break
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    val fatArr = nutrientArr[i].split(" ")
+                                    for (word in fatArr) {
+                                        if (word.contains("g")) {
+                                            parsedProductInfo.fat = Utils.removeKorean(word).replace(">","")
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        nutrientArr[i].contains(NutrientConst.CARBOHYDRATE) -> {
+                            val cholArr = nutrientArr[i].split(" ")
+                            for (word in cholArr) {
+                                if (word.contains("g")) {
+                                    parsedProductInfo.cholesterol = Utils.removeKorean(word).replace(">","")
+                                    break
+                                }
+                            }
+                        }
+                        nutrientArr[i].contains(NutrientConst.SALT) -> {
+                            val saltArr = nutrientArr[i].split(" ")
+                            for (word in saltArr) {
+                                if (word.contains("g")) {
+                                    parsedProductInfo.salt = Utils.removeKorean(word).replace(">","")
+                                    break
+                                }
                             }
                         }
                     }
                 }
+                parsedDataList.add(parsedProductInfo)
             }
-            parsedDataList.add(parsedProductInfo)
         }
         //Log.d(tag, "Paging data : $parsedDataList")
         return parsedDataList
