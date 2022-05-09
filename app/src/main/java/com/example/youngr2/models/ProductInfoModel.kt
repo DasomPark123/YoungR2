@@ -5,20 +5,20 @@ import com.google.gson.annotations.SerializedName
 data class ProductInfoModel(
 
     @SerializedName("list")
-    val list : List<ProductListItemModel>,
+    val list : List<ProductListItemModel> = listOf(),
 
     @SerializedName("totalCount")
-    val totalCount : String,
+    val totalCount : String = "",
 
     @SerializedName("pageNo")
-    val pageNo : String,
+    val pageNo : String = "",
 
     @SerializedName("resultCode")
-    val resultCode : String,
+    val resultCode : String = "",
 
     @SerializedName("resultMessage")
-    val resultMessage : String,
+    val resultMessage : String = "",
 
     @SerializedName("numOfRows")
-    val numOfRows : String
+    val numOfRows : String = ""
 )

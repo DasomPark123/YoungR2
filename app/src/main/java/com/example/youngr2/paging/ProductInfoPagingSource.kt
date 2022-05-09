@@ -5,12 +5,12 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.youngr2.NutrientConst
 import com.example.youngr2.api.ProductInfoApi
+import com.example.youngr2.findWordBetweenBracket
 import com.example.youngr2.models.ParsedProductInfo
 import com.example.youngr2.models.ProductListItemModel
-import com.example.youngr2.utils.Utils
+import com.example.youngr2.removeKorean
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.StringBuilder
 
 class ProductInfoPagingSource(
     private val service: ProductInfoApi,
@@ -80,15 +80,14 @@ class ProductInfoPagingSource(
             }
             productInfo.prdlstNm?.let { parsedProductInfo.product = productInfo.prdlstNm }
             productInfo.manufacture?.let {
-                parsedProductInfo.seller =
-                    productInfo.manufacture.split(" ")[0].split("/")[0].split("_")[0].split(",")[0]
+                parsedProductInfo.seller = productInfo.manufacture.split(" ", "/", "_", ",")[0]
             }
             productInfo.imgurl1?.let { parsedProductInfo.imageUrl = productInfo.imgurl1 }
             productInfo.capacity?.let {
                 if (productInfo.capacity.contains("(")) {
                     parsedProductInfo.total_content =
                         productInfo.capacity.substring(0, productInfo.capacity.indexOf("("))
-                    parsedProductInfo.calorie = Utils.findWordBetweenBracket(productInfo.capacity).replace(">","")
+                    parsedProductInfo.calorie = findWordBetweenBracket(productInfo.capacity).replace(">","")
                 } else {
                     parsedProductInfo.total_content = productInfo.capacity.replace(">","")
                 }
@@ -106,7 +105,7 @@ class ProductInfoPagingSource(
                                         when {
                                             calArr[i].length == 4 && i != 0 -> { // ex) 250 kcal : 숫자와 kcal 사이에 띄어쓰기가 있는 경우
                                                 parsedProductInfo.calorie =
-                                                    (Utils.removeKorean(calArr[i - 1]) + Utils.removeKorean(
+                                                    (removeKorean(calArr[i - 1]) + removeKorean(
                                                         calArr[i]
                                                     )).replace(">","")
                                             }
@@ -115,9 +114,9 @@ class ProductInfoPagingSource(
                                             }
                                             else -> {
                                                 parsedProductInfo.calorie =
-                                                    Utils.removeKorean(calArr[i]).substring(
+                                                    removeKorean(calArr[i]).substring(
                                                         0,
-                                                        Utils.removeKorean(calArr[i])
+                                                        removeKorean(calArr[i])
                                                             .indexOf(NutrientConst.CALORIE) + 4
                                                     ).replace(">","")
                                             }
@@ -131,7 +130,7 @@ class ProductInfoPagingSource(
                             val carArr = nutrientArr[i].split(" ")
                             for (word in carArr) {
                                 if (word.contains("g")) {
-                                    parsedProductInfo.carbohydrate = Utils.removeKorean(word).replace(">","")
+                                    parsedProductInfo.carbohydrate = removeKorean(word).replace(">","")
                                     break
                                 }
                             }
@@ -140,7 +139,7 @@ class ProductInfoPagingSource(
                             val sugarArr = nutrientArr[i].split(" ")
                             for (word in sugarArr) {
                                 if (word.contains("g")) {
-                                    parsedProductInfo.sugars = Utils.removeKorean(word).replace(">","")
+                                    parsedProductInfo.sugars = removeKorean(word).replace(">","")
                                     break
                                 }
                             }
@@ -149,7 +148,7 @@ class ProductInfoPagingSource(
                             val sugarArr = nutrientArr[i].split(" ")
                             for (word in sugarArr) {
                                 if (word.contains("g")) {
-                                    parsedProductInfo.sugars = Utils.removeKorean(word).replace(">","")
+                                    parsedProductInfo.sugars = removeKorean(word).replace(">","")
                                     break
                                 }
                             }
@@ -158,7 +157,7 @@ class ProductInfoPagingSource(
                             val proteinArr = nutrientArr[i].split(" ")
                             for (word in proteinArr) {
                                 if (word.contains("g")) {
-                                    parsedProductInfo.protein = Utils.removeKorean(word).replace(">","")
+                                    parsedProductInfo.protein = removeKorean(word).replace(">","")
                                     break
                                 }
                             }
@@ -170,7 +169,7 @@ class ProductInfoPagingSource(
                                     for (word in satArr) {
                                         if (word.contains("g")) {
                                             parsedProductInfo.saturatedFat =
-                                                Utils.removeKorean(word).replace(">","")
+                                                removeKorean(word).replace(">","")
                                             break
                                         }
                                     }
@@ -179,7 +178,7 @@ class ProductInfoPagingSource(
                                     val transArr = nutrientArr[i].split(" ")
                                     for (word in transArr) {
                                         if (word.contains("g")) {
-                                            parsedProductInfo.transFat = Utils.removeKorean(word).replace(">","")
+                                            parsedProductInfo.transFat = removeKorean(word).replace(">","")
                                             break
                                         }
                                     }
@@ -188,7 +187,7 @@ class ProductInfoPagingSource(
                                     val fatArr = nutrientArr[i].split(" ")
                                     for (word in fatArr) {
                                         if (word.contains("g")) {
-                                            parsedProductInfo.fat = Utils.removeKorean(word).replace(">","")
+                                            parsedProductInfo.fat = removeKorean(word).replace(">","")
                                             break
                                         }
                                     }
@@ -199,7 +198,7 @@ class ProductInfoPagingSource(
                             val cholArr = nutrientArr[i].split(" ")
                             for (word in cholArr) {
                                 if (word.contains("g")) {
-                                    parsedProductInfo.cholesterol = Utils.removeKorean(word).replace(">","")
+                                    parsedProductInfo.cholesterol = removeKorean(word).replace(">","")
                                     break
                                 }
                             }
@@ -208,7 +207,7 @@ class ProductInfoPagingSource(
                             val saltArr = nutrientArr[i].split(" ")
                             for (word in saltArr) {
                                 if (word.contains("g")) {
-                                    parsedProductInfo.salt = Utils.removeKorean(word).replace(">","")
+                                    parsedProductInfo.salt = removeKorean(word).replace(">","")
                                     break
                                 }
                             }

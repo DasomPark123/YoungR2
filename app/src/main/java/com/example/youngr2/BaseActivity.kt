@@ -102,26 +102,4 @@ abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId
         }
         this.progressBar = dialog
     }
-
-    protected fun showSnackBar(view: View, msg: String) {
-        Snackbar.make(view, msg, Snackbar.LENGTH_SHORT).run { show() }
-    }
-
-    protected fun showAlertDialog(title: String, msg: String) {
-        AlertDialog.Builder(
-            this@BaseActivity,
-            android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth
-        ).apply {
-            setTitle(title)
-            setMessage(msg)
-            setPositiveButton(
-                getString(R.string.ok),
-                DialogInterface.OnClickListener { dialogInterface, i ->
-                    Intent(this@BaseActivity, MainActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    }.run { startActivity(this) }
-                })
-            show()
-        }
-    }
 }

@@ -7,17 +7,13 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityMainBinding
-import com.example.youngr2.utils.Utils
 
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     private val tag: String = javaClass.simpleName
 
-    private lateinit var utils: Utils
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        utils = Utils(this)
     }
 
     override fun beforeSetContentView() {
@@ -42,8 +38,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
                 EditorInfo.IME_ACTION_SEARCH -> {
                     val product: String = binding.etSearch.text.toString()
                     if (product.isEmpty()) {
-                        utils.hideKeyboard(v)
-                        showSnackBar(binding.llMain, getString(R.string.request_input_text))
+                        hideKeyboard(v)
+                        showSnackbar(binding.llMain, getString(R.string.request_input_text))
                     } else {
                         Intent(this@MainActivity, ProductListActivity::class.java).apply {
                             putExtra(CustomApplication.EXTRA_PRODUCT, product)
