@@ -16,19 +16,19 @@
         android:theme="@style/Theme.YoungR2"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".BarcodeActivity"
+            android:name=".view.BarcodeActivity"
             android:exported="false" />
         <activity
-            android:name=".ProductListActivity"
+            android:name=".view.product_list.ProductListActivity"
             android:exported="false" />
         <activity
-            android:name=".BaseActivity"
+            android:name=".view.base.BaseActivity"
             android:exported="false" />
         <activity
-            android:name=".NutrientInfoActivity"
+            android:name=".view.NutrientInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>

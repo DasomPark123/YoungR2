@@ -1,4 +1,4 @@
-package com.example.youngr2.modules
+package com.example.youngr2.remote
 
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient

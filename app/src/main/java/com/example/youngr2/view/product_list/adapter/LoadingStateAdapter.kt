@@ -1,4 +1,4 @@
-package com.example.youngr2.adapter
+package com.example.youngr2.view.product_list.adapter
 
 import android.util.Log
 import android.view.LayoutInflater

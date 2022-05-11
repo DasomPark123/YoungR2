@@ -1,21 +1,21 @@
-package com.example.youngr2.paging
+package com.example.youngr2.repositories.paging
 
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.youngr2.NutrientConst
-import com.example.youngr2.api.ProductInfoApi
+import com.example.youngr2.remote.api.ProductInfoApi
 import com.example.youngr2.findWordBetweenBracket
-import com.example.youngr2.models.ParsedProductInfo
-import com.example.youngr2.models.ProductListItemModel
+import com.example.youngr2.remote.models.ParsedProductInfoModel
+import com.example.youngr2.remote.models.ProductListItemModel
 import com.example.youngr2.removeKorean
+import com.example.youngr2.utils.*
 import retrofit2.HttpException
 import java.io.IOException
 
 class ProductInfoPagingSource(
     private val service: ProductInfoApi,
     private val product: String,
-) : PagingSource<Int, ParsedProductInfo>() {
+) : PagingSource<Int, ParsedProductInfoModel>() {
 
     private val tag = javaClass.simpleName
 
@@ -25,7 +25,7 @@ class ProductInfoPagingSource(
     }
 
     // 사용자가 scroll 할 떄 표시할 더 많은 데이터를 비동기식으로 가져오기 위해 호출하는 부분
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ParsedProductInfo> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ParsedProductInfoModel> {
         val position = params.key ?: PRODUCT_INFO_STARTING_PAGE_INDEX // params.key 는 첫 호출 시 null 임
 
         return try {
@@ -61,20 +61,20 @@ class ProductInfoPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, ParsedProductInfo>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, ParsedProductInfoModel>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
     }
 
-    private fun parseProductInfo(productInfoList: List<ProductListItemModel>?): List<ParsedProductInfo> {
+    private fun parseProductInfo(productInfoList: List<ProductListItemModel>?): List<ParsedProductInfoModel> {
         if (productInfoList == null || productInfoList.isEmpty()) {
             return listOf()
         }
-        val parsedDataList: ArrayList<ParsedProductInfo> = ArrayList()
+        val parsedDataListModel: ArrayList<ParsedProductInfoModel> = ArrayList()
         for (productInfo in productInfoList) {
-            val parsedProductInfo = ParsedProductInfo()
+            val parsedProductInfo = ParsedProductInfoModel()
             productInfo.prdlstReportNo?.let {
                 parsedProductInfo.productId = productInfo.prdlstReportNo
             }
@@ -93,12 +93,12 @@ class ProductInfoPagingSource(
                 }
             } ?: continue
 
-            if (productInfo.nutrient != null && productInfo.nutrient != NutrientConst.UNKNOWN) {
+            if (productInfo.nutrient != null && productInfo.nutrient != UNKNOWN) {
                 val nutrientArr = productInfo.nutrient.split(",")
                 for (i in nutrientArr.indices) {
                     when {
-                        nutrientArr[i].contains(NutrientConst.CALORIE) -> {
-                            if (!parsedProductInfo.calorie.contains(NutrientConst.CALORIE)) {
+                        nutrientArr[i].contains(CALORIE) -> {
+                            if (!parsedProductInfo.calorie.contains(CALORIE)) {
                                 val calArr = nutrientArr[i].split(" ")
                                 for (i in calArr.indices) {
                                     if (calArr[i].contains("kcal")) {
@@ -117,7 +117,7 @@ class ProductInfoPagingSource(
                                                     removeKorean(calArr[i]).substring(
                                                         0,
                                                         removeKorean(calArr[i])
-                                                            .indexOf(NutrientConst.CALORIE) + 4
+                                                            .indexOf(CALORIE) + 4
                                                     ).replace(">","")
                                             }
                                         }
@@ -126,7 +126,7 @@ class ProductInfoPagingSource(
                                 }
                             }
                         }
-                        nutrientArr[i].contains(NutrientConst.CARBOHYDRATE) -> {
+                        nutrientArr[i].contains(CARBOHYDRATE) -> {
                             val carArr = nutrientArr[i].split(" ")
                             for (word in carArr) {
                                 if (word.contains("g")) {
@@ -135,7 +135,7 @@ class ProductInfoPagingSource(
                                 }
                             }
                         }
-                        nutrientArr[i].contains(NutrientConst.SUGAR) -> {
+                        nutrientArr[i].contains(SUGAR) -> {
                             val sugarArr = nutrientArr[i].split(" ")
                             for (word in sugarArr) {
                                 if (word.contains("g")) {
@@ -144,7 +144,7 @@ class ProductInfoPagingSource(
                                 }
                             }
                         }
-                        nutrientArr[i].contains(NutrientConst.SUGAR) -> {
+                        nutrientArr[i].contains(SUGAR) -> {
                             val sugarArr = nutrientArr[i].split(" ")
                             for (word in sugarArr) {
                                 if (word.contains("g")) {
@@ -153,7 +153,7 @@ class ProductInfoPagingSource(
                                 }
                             }
                         }
-                        nutrientArr[i].contains(NutrientConst.PROTEIN) -> {
+                        nutrientArr[i].contains(PROTEIN) -> {
                             val proteinArr = nutrientArr[i].split(" ")
                             for (word in proteinArr) {
                                 if (word.contains("g")) {
@@ -162,9 +162,9 @@ class ProductInfoPagingSource(
                                 }
                             }
                         }
-                        nutrientArr[i].contains(NutrientConst.FAT) -> {
+                        nutrientArr[i].contains(FAT) -> {
                             when {
-                                nutrientArr[i].contains(NutrientConst.SATURATED_FAT) -> {
+                                nutrientArr[i].contains(SATURATED_FAT) -> {
                                     val satArr = nutrientArr[i].split(" ")
                                     for (word in satArr) {
                                         if (word.contains("g")) {
@@ -174,7 +174,7 @@ class ProductInfoPagingSource(
                                         }
                                     }
                                 }
-                                nutrientArr[i].contains(NutrientConst.TRANS_FAT) -> {
+                                nutrientArr[i].contains(TRANS_FAT) -> {
                                     val transArr = nutrientArr[i].split(" ")
                                     for (word in transArr) {
                                         if (word.contains("g")) {
@@ -194,7 +194,7 @@ class ProductInfoPagingSource(
                                 }
                             }
                         }
-                        nutrientArr[i].contains(NutrientConst.CARBOHYDRATE) -> {
+                        nutrientArr[i].contains(CARBOHYDRATE) -> {
                             val cholArr = nutrientArr[i].split(" ")
                             for (word in cholArr) {
                                 if (word.contains("g")) {
@@ -203,7 +203,7 @@ class ProductInfoPagingSource(
                                 }
                             }
                         }
-                        nutrientArr[i].contains(NutrientConst.SALT) -> {
+                        nutrientArr[i].contains(SALT) -> {
                             val saltArr = nutrientArr[i].split(" ")
                             for (word in saltArr) {
                                 if (word.contains("g")) {
@@ -214,10 +214,10 @@ class ProductInfoPagingSource(
                         }
                     }
                 }
-                parsedDataList.add(parsedProductInfo)
+                parsedDataListModel.add(parsedProductInfo)
             }
         }
         //Log.d(tag, "Paging data : $parsedDataList")
-        return parsedDataList
+        return parsedDataListModel
     }
 }

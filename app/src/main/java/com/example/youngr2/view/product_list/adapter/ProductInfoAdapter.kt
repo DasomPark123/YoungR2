@@ -1,18 +1,17 @@
-package com.example.youngr2.adapter
+package com.example.youngr2.view.product_list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.example.youngr2.databinding.ItemSearchResultBinding
-import com.example.youngr2.holder.ProductInfoViewHolder
-import com.example.youngr2.models.ParsedProductInfo
-import com.example.youngr2.models.ProductListItemModel
+import com.example.youngr2.view.product_list.adapter.holder.ProductInfoViewHolder
+import com.example.youngr2.remote.models.ParsedProductInfoModel
 
-class ProductInfoAdapter(private val clickListener: OnProductClickListener) : PagingDataAdapter<ParsedProductInfo, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
+class ProductInfoAdapter(private val clickListener: OnProductClickListener) : PagingDataAdapter<ParsedProductInfoModel, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
 
     interface OnProductClickListener {
-        fun onItemClick(data : ParsedProductInfo)
+        fun onItemClick(data : ParsedProductInfoModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductInfoViewHolder {
@@ -26,15 +25,15 @@ class ProductInfoAdapter(private val clickListener: OnProductClickListener) : Pa
         item?.let {  holder.bind(item) }
     }
     companion object {
-        private val PRODUCT_INFO_COMPARATOR = object : DiffUtil.ItemCallback<ParsedProductInfo>() {
+        private val PRODUCT_INFO_COMPARATOR = object : DiffUtil.ItemCallback<ParsedProductInfoModel>() {
             override fun areItemsTheSame(
-                oldItem: ParsedProductInfo,
-                newItem: ParsedProductInfo
+                oldItem: ParsedProductInfoModel,
+                newItem: ParsedProductInfoModel
             ): Boolean = oldItem.productId == newItem.productId
 
             override fun areContentsTheSame(
-                oldItem: ParsedProductInfo,
-                newItem: ParsedProductInfo
+                oldItem: ParsedProductInfoModel,
+                newItem: ParsedProductInfoModel
             ): Boolean = oldItem == newItem
         }
     }

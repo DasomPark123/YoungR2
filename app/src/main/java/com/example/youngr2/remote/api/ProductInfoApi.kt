@@ -1,10 +1,8 @@
-package com.example.youngr2.api
+package com.example.youngr2.remote.api
 
 import com.example.youngr2.const.ServiceKeyConst
-import com.example.youngr2.models.ProductInfoModel
+import com.example.youngr2.remote.models.ProductInfoModel
 import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ProductInfoApi {

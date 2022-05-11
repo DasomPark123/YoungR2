@@ -1,12 +1,17 @@
-package com.example.youngr2
+package com.example.youngr2.view
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.example.youngr2.R
 import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityMainBinding
+import com.example.youngr2.utils.hideKeyboard
+import com.example.youngr2.utils.showSnackbar
+import com.example.youngr2.view.base.BaseActivity
+import com.example.youngr2.view.product_list.ProductListActivity
 
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 

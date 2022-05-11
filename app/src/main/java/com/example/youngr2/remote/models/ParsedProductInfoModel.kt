@@ -1,9 +1,9 @@
-package com.example.youngr2.models
+package com.example.youngr2.remote.models
 
 import android.os.Parcelable
 
 @kotlinx.parcelize.Parcelize
-data class ParsedProductInfo (
+data class ParsedProductInfoModel (
     var productId : String = "알수없음",
     var product : String = "알수없음",
     var seller : String = "알수없음",

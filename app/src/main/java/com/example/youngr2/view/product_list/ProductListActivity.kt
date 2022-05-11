@@ -1,4 +1,4 @@
-package com.example.youngr2
+package com.example.youngr2.view.product_list
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,14 +8,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.youngr2.adapter.LoadingStateAdapter
-import com.example.youngr2.adapter.ProductInfoAdapter
+import com.example.youngr2.R
+import com.example.youngr2.view.product_list.adapter.LoadingStateAdapter
+import com.example.youngr2.view.product_list.adapter.ProductInfoAdapter
 import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityNutrientListBinding
-import com.example.youngr2.factory.ProductInfoViewModelFactory
-import com.example.youngr2.models.ParsedProductInfo
-import com.example.youngr2.modules.ProductInfoService
+import com.example.youngr2.viewmodels.factory.ProductInfoViewModelFactory
+import com.example.youngr2.remote.models.ParsedProductInfoModel
+import com.example.youngr2.remote.ProductInfoService
 import com.example.youngr2.repositories.ProductInfoRepository
+import com.example.youngr2.view.base.BaseActivity
+import com.example.youngr2.view.NutrientInfoActivity
 import com.example.youngr2.viewmodels.ProductInfoViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -57,7 +60,7 @@ class ProductListActivity :
         // Init adapter
         productInfoAdapter =
             ProductInfoAdapter(clickListener = object : ProductInfoAdapter.OnProductClickListener {
-                override fun onItemClick(data: ParsedProductInfo) {
+                override fun onItemClick(data: ParsedProductInfoModel) {
                     Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
                         putExtra(CustomApplication.EXTRA_PRODUCT_DATA, data)
                     }.run { startActivity(this) }

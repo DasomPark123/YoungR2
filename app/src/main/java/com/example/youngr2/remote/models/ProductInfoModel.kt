@@ -1,4 +1,4 @@
-package com.example.youngr2.models
+package com.example.youngr2.remote.models
 
 import com.google.gson.annotations.SerializedName
 

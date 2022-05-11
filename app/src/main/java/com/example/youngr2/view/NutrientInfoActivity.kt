@@ -1,11 +1,13 @@
-package com.example.youngr2
+package com.example.youngr2.view
 
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import com.bumptech.glide.Glide
+import com.example.youngr2.R
 import com.example.youngr2.application.CustomApplication
 import com.example.youngr2.databinding.ActivityNutrientInfoBinding
+import com.example.youngr2.view.base.BaseActivity
 
 class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.activity_nutrient_info) {
 

@@ -1,8 +1,7 @@
-package com.example.youngr2.models
+package com.example.youngr2.remote.models
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
 @kotlinx.parcelize.Parcelize
 data class ProductListItemModel(
@@ -51,6 +50,5 @@ data class ProductListItemModel(
 
     @SerializedName("seller")
     val seller: String?
-
 
 ) : Parcelable

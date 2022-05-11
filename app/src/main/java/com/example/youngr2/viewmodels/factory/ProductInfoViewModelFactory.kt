@@ -1,4 +1,4 @@
-package com.example.youngr2.factory
+package com.example.youngr2.viewmodels.factory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
