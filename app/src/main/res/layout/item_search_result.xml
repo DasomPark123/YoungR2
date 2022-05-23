@@ -4,7 +4,7 @@
     <data>
         <variable
             name="productInfo"
-            type="com.example.youngr2.remote.models.ParsedProductInfoModel" />
+            type="com.nutrient.youngr2.remote.models.ParsedProductInfoModel" />
     </data>
 
     <LinearLayout

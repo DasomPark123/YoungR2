@@ -25,6 +25,9 @@
     <string name="g">%sg</string>
     <string name="mg">%smg</string>
 
+    <!--Barcode-->
+    <string name="scan_barcode">상품의 바코드를 스캔해주세요</string>
+
     <!-- snackbar -->
     <string name="request_input_text">식품이름을 검색해 주세요.</string>
     <!-- progressbar -->

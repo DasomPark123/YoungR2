@@ -4,8 +4,17 @@
 
     </data>
 
-    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+    <LinearLayout
+        android:id="@+id/ll_barcode"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.journeyapps.barcodescanner.DecoratedBarcodeView
+            android:id="@+id/barcode_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
 
 </layout>
