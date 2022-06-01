@@ -1,11 +1,15 @@
 package com.nutrient.youngr2.view
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.zxing.client.android.Intents
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.ScanContract
@@ -41,10 +45,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     }
 
     private fun startScanBarcode() {
-        val options : ScanOptions = ScanOptions().setOrientationLocked(false).setCaptureActivity(BarcodeActivity::class.java)
+        val options : ScanOptions = ScanOptions().setOrientationLocked(true).setCaptureActivity(BarcodeActivity::class.java)
         options.apply {
             setBarcodeImageEnabled(true)
-            setBeepEnabled(true)
+            setBarcodeImageEnabled(true)
+            setBeepEnabled(false)
             setPrompt(getString(R.string.scan_barcode))
             barcodeLauncher.launch(options)
         }
@@ -52,17 +57,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     private val barcodeLauncher : ActivityResultLauncher<ScanOptions> = registerForActivityResult(ScanContract()) { result ->
         result.contents?.let {
+            Intent(this@MainActivity, ProductListActivity::class.java).apply {
+                putExtra(CustomApplication.EXTRA_BARCODE_DATA, it)
+            }.run { startActivity(this) }
             showSnackbar(binding.llMain, "상품 바코드 : $it")
         } ?: run {
             val originalIntent = result.originalIntent
             originalIntent?.let {
                 if(originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
-                    showSnackbar(binding.llMain, "Camera permission required")
+                    showSnackbar(binding.llMain, getString(R.string.camera_permission_required))
                 }
-            } ?: run { showSnackbar(binding.llMain, "Scan cancelled")}
+            } ?: run { showSnackbar(binding.llMain, getString(R.string.scan_canceled))}
         }
     }
-
 
     /* Soft 키보드에서 돋보기 모양 아이콘 (검색) 을 클릭했을 때 동작하는 부분 */
     private val onEditorActionListener =
@@ -85,7 +92,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             }
             handled
         }
-
 
     private val onClickListener =
         View.OnClickListener {

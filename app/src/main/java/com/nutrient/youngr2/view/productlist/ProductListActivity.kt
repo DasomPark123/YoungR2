@@ -13,9 +13,11 @@ import com.nutrient.youngr2.view.productlist.adapter.LoadingStateAdapter
 import com.nutrient.youngr2.view.productlist.adapter.ProductInfoAdapter
 import com.nutrient.youngr2.application.CustomApplication
 import com.nutrient.youngr2.databinding.ActivityNutrientListBinding
+import com.nutrient.youngr2.remote.BarcodeInfoService
 import com.nutrient.youngr2.viewmodels.factory.ProductInfoViewModelFactory
 import com.nutrient.youngr2.remote.models.ParsedProductInfoModel
 import com.nutrient.youngr2.remote.ProductInfoService
+import com.nutrient.youngr2.remote.models.BarcodeInfoModel
 import com.nutrient.youngr2.repositories.ProductInfoRepository
 import com.nutrient.youngr2.view.base.BaseActivity
 import com.nutrient.youngr2.view.NutrientInfoActivity
@@ -107,14 +109,30 @@ class ProductListActivity :
         super.initViewModel()
         //viewModelFactory = NutrientViewModelFactory(NutrientRepository(NutrientService.client!!))
         viewModelFactory =
-            ProductInfoViewModelFactory(ProductInfoRepository(ProductInfoService.client!!))
+            ProductInfoViewModelFactory(
+                ProductInfoRepository(
+                    ProductInfoService.client!!,
+                    BarcodeInfoService.client!!
+                )
+            )
         viewModel = ViewModelProvider(this, viewModelFactory).get(ProductInfoViewModel::class.java)
     }
 
     /* Invoked from onCreate() in BaseActivity */
     override fun afterOnCreate() {
         super.afterOnCreate()
-        intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)?.let { searchProductInfo(it) } ?: run { searchAllProductInfo() }
+        intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)
+            ?.let { productName -> searchProductInfo(productName) } /* Product 이름 검색 */
+            ?: run {
+                intent.getStringExtra(CustomApplication.EXTRA_BARCODE_DATA)
+                    ?.let { barcodeNo ->
+                        val productName = viewModel.getProductNameByBarcode(barcodeNo)
+                        if(productName != null) {
+                            searchProductInfo(productName)
+                        }
+                    } /* Barcode 로 검색 */
+                    ?: run { searchAllProductInfo() } /* List 로 검색 */
+            }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

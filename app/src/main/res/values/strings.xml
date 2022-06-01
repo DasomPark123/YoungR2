@@ -30,6 +30,8 @@
 
     <!-- snackbar -->
     <string name="request_input_text">식품이름을 검색해 주세요.</string>
+    <string name="scan_canceled">상품 스캔 취소</string>
+    <string name="camera_permission_required"> 카메라 권한이 필요합니다.</string>
     <!-- progressbar -->
     <string name="please_wait">잠시만 기다려주세요...</string>
     <!-- Alert dialog -->
