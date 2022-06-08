@@ -2,6 +2,7 @@ package com.nutrient.youngr2.view.productlist
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -17,8 +18,8 @@ import com.nutrient.youngr2.remote.BarcodeInfoService
 import com.nutrient.youngr2.viewmodels.factory.ProductInfoViewModelFactory
 import com.nutrient.youngr2.remote.models.ParsedProductInfoModel
 import com.nutrient.youngr2.remote.ProductInfoService
-import com.nutrient.youngr2.remote.models.BarcodeInfoModel
 import com.nutrient.youngr2.repositories.ProductInfoRepository
+import com.nutrient.youngr2.utils.Result
 import com.nutrient.youngr2.view.base.BaseActivity
 import com.nutrient.youngr2.view.NutrientInfoActivity
 import com.nutrient.youngr2.viewmodels.ProductInfoViewModel
@@ -122,17 +123,26 @@ class ProductListActivity :
     override fun afterOnCreate() {
         super.afterOnCreate()
         intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)
-            ?.let { productName -> searchProductInfo(productName) } /* Product 이름 검색 */
+            ?.let { productName ->
+                Log.d(tag, "Search Product")
+                searchProductInfo(productName)
+            } /* Product 이름 검색 */
             ?: run {
                 intent.getStringExtra(CustomApplication.EXTRA_BARCODE_DATA)
                     ?.let { barcodeNo ->
-                        val productName = viewModel.getProductNameByBarcode(barcodeNo)
-                        if(productName != null) {
-                            searchProductInfo(productName)
-                        }
+                        Log.d(tag, "Search Barcode")
+                        getProductInfoByBarcode(barcodeNo)
                     } /* Barcode 로 검색 */
-                    ?: run { searchAllProductInfo() } /* List 로 검색 */
+                    ?: run {
+                        Log.d(tag, "Search all data")
+                        searchAllProductInfo()
+                    } /* List 로 검색 */
             }
+
+        intent.apply {
+            removeExtra(CustomApplication.EXTRA_PRODUCT)
+            removeExtra(CustomApplication.EXTRA_BARCODE_DATA)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -163,6 +173,27 @@ class ProductListActivity :
                 if (::productInfoAdapter.isInitialized) {
                     productInfoAdapter.submitData(it)
                 }
+            }
+        }
+    }
+
+    private fun getProductInfoByBarcode(barcodeNo : String) {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            viewModel.getProductNameByBarcode(barcodeNo).collectLatest { result ->
+                when(result) {
+                    is Result.Success -> {
+                        if(result.data.COO5.total_count != "0") {
+                            searchProductInfo(result.data.COO5.row[0].productName)
+                        }
+                    }
+                    is Result.Error -> {
+                        // TODO : setResult 필요함
+                        finish()
+                    }
+                }
+
+
             }
         }
     }

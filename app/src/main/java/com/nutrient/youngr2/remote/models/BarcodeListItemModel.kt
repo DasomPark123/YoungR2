@@ -4,27 +4,36 @@ import com.google.gson.annotations.SerializedName
 
 data class BarcodeListItemModel(
 
+    @SerializedName("CLSBIZ_DT")
+    val closedBusinessData : String = "",
+
+    @SerializedName("SITE_ADDR")
+    val address : String = "",
+
     @SerializedName("PRDLST_REPORT_NO")
-    val productListReportNo : String = "",
+    val productReportNo : String = "",
 
-    @SerializedName("HTRK_PRDLST_NM")
-    val itemMainCategory : String = "",
-
-    @SerializedName("LAST_UPDT_DTM")
-    val lastUpdateDateTime : String = "",
-
-    @SerializedName("HRNK_PRDLST_NM")
-    val itemMiddleCategory : String = "",
-
-    @SerializedName("BRCD_NO")
-    val barcodeNo : String = "",
+    @SerializedName("PRMS_DT")
+    val reportDate : String = "",
 
     @SerializedName("PRDLST_NM")
-    val itemSubCategory : String = "",
-
-    @SerializedName("PRDT_NM")
     val productName : String = "",
 
-    @SerializedName("CMPNY_NM")
-    val companyName : String = ""
+    @SerializedName("BAR_CD")
+    val barcodeNo : String = "",
+
+    @SerializedName("POG_DAYCNT")
+    val expirationDate : String = "",
+
+    @SerializedName("PRDLST_DCNM")
+    val productType : String = "",
+
+    @SerializedName("BSSH_NM")
+    val companyName : String = "",
+
+    @SerializedName("END_DT")
+    val productionStopDate : String = "",
+
+    @SerializedName("INDUTY_NM")
+    val sectors : String = ""
 )

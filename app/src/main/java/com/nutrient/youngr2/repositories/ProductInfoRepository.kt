@@ -7,6 +7,7 @@ import com.nutrient.youngr2.const.ServiceKeyConst
 import com.nutrient.youngr2.remote.api.BarcodeInfoApi
 import com.nutrient.youngr2.remote.api.ProductInfoApi
 import com.nutrient.youngr2.remote.models.BarcodeInfoModel
+import com.nutrient.youngr2.remote.models.BarcodeServiceModel
 import com.nutrient.youngr2.remote.models.ParsedProductInfoModel
 import com.nutrient.youngr2.repositories.paging.ProductInfoPagingSource
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +27,7 @@ class ProductInfoRepository(
         ).flow
     }
 
-    suspend fun getProductNameByBarcode(barcodeNo : String) : Response<BarcodeInfoModel> {
+    suspend fun getProductNameByBarcode(barcodeNo : String) : Response<BarcodeServiceModel> {
         return barcodeClient.getProductByBarcode(ServiceKeyConst.PRODUCT_BARCODE_KEY, "json", barcodeNo)
     }
 }
