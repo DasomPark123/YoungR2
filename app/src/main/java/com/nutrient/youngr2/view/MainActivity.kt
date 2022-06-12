@@ -60,7 +60,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
             Intent(this@MainActivity, ProductListActivity::class.java).apply {
                 putExtra(CustomApplication.EXTRA_BARCODE_DATA, it)
             }.run { startActivity(this) }
-            showSnackbar(binding.llMain, "상품 바코드 : $it")
+            //showSnackbar(binding.llMain, "상품 바코드 : $it")
         } ?: run {
             val originalIntent = result.originalIntent
             originalIntent?.let {

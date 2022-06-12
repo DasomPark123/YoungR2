@@ -14,12 +14,12 @@ import com.nutrient.youngr2.view.productlist.adapter.LoadingStateAdapter
 import com.nutrient.youngr2.view.productlist.adapter.ProductInfoAdapter
 import com.nutrient.youngr2.application.CustomApplication
 import com.nutrient.youngr2.databinding.ActivityNutrientListBinding
-import com.nutrient.youngr2.remote.BarcodeInfoService
+import com.nutrient.youngr2.remote.services.BarcodeInfoService
 import com.nutrient.youngr2.viewmodels.factory.ProductInfoViewModelFactory
-import com.nutrient.youngr2.remote.models.ParsedProductInfoModel
-import com.nutrient.youngr2.remote.ProductInfoService
+import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
+import com.nutrient.youngr2.remote.services.ProductInfoService
 import com.nutrient.youngr2.repositories.ProductInfoRepository
-import com.nutrient.youngr2.utils.Result
+import com.nutrient.youngr2.remote.responses.ApiResult
 import com.nutrient.youngr2.view.base.BaseActivity
 import com.nutrient.youngr2.view.NutrientInfoActivity
 import com.nutrient.youngr2.viewmodels.ProductInfoViewModel
@@ -36,7 +36,6 @@ class ProductListActivity :
     //    private lateinit var viewModelFactory: NutrientViewModelFactory
     private lateinit var productInfoAdapter: ProductInfoAdapter
     private lateinit var viewModelFactory: ProductInfoViewModelFactory
-
 
     private var searchJob: Job? = null
 
@@ -63,7 +62,7 @@ class ProductListActivity :
         // Init adapter
         productInfoAdapter =
             ProductInfoAdapter(clickListener = object : ProductInfoAdapter.OnProductClickListener {
-                override fun onItemClick(data: ParsedProductInfoModel) {
+                override fun onItemClick(data: ParsedProductListItemModel) {
                     Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
                         putExtra(CustomApplication.EXTRA_PRODUCT_DATA, data)
                     }.run { startActivity(this) }
@@ -124,19 +123,22 @@ class ProductListActivity :
         super.afterOnCreate()
         intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)
             ?.let { productName ->
+                /* Product 이름 검색 */
                 Log.d(tag, "Search Product")
-                searchProductInfo(productName)
-            } /* Product 이름 검색 */
+                searchProductInfoByProductName(productName)
+            }
             ?: run {
                 intent.getStringExtra(CustomApplication.EXTRA_BARCODE_DATA)
                     ?.let { barcodeNo ->
+                        /* Barcode 로 검색 */
                         Log.d(tag, "Search Barcode")
-                        getProductInfoByBarcode(barcodeNo)
-                    } /* Barcode 로 검색 */
+                        searchProductInfoByBarcode(barcodeNo)
+                    }
                     ?: run {
+                        /* List 로 검색 */
                         Log.d(tag, "Search all data")
                         searchAllProductInfo()
-                    } /* List 로 검색 */
+                    }
             }
 
         intent.apply {
@@ -155,13 +157,44 @@ class ProductListActivity :
         return super.onOptionsItemSelected(item)
     }
 
-    private fun searchProductInfo(product: String) {
+    private fun searchProductInfoByProductName(product: String) {
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
-            viewModel.requestProductInfo(product).collectLatest {
+            viewModel.requestProductInfoByProductName(product).collectLatest {
                 if (::productInfoAdapter.isInitialized) {
                     productInfoAdapter.submitData(it)
                 }
+            }
+        }
+    }
+
+    /* TODO:Main 으로 옮기고 reportNo 검색 시 검색 결과가 없으면 product Name 으로 검색해서 리스트 뿌리기 */
+    private fun searchProductInfoByProductReportNo(reportNo: String) {
+        val successCode = "OK"
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            viewModel.requestProductInfoByProductReportNo(reportNo).collectLatest { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        if (result.data.resultCode == successCode
+                            && result.data.totalCount != "0") {
+                            Log.d(tag, "result success : $result")
+                            Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
+                                putExtra(CustomApplication.EXTRA_PRODUCT_DATA, result.data.list[0])
+                            }.run { startActivity(this) }
+                        } else {
+                            Log.d(tag, "result success with error code: $result")
+                            //TODO : setResult 필요
+                            finish()
+                        }
+                    }
+                    is ApiResult.Error -> {
+                        Log.d(tag, "result success : $result")
+                        //TODO : setResult 필요
+                        finish()
+                    }
+                }
+
             }
         }
     }
@@ -177,23 +210,30 @@ class ProductListActivity :
         }
     }
 
-    private fun getProductInfoByBarcode(barcodeNo : String) {
+    private fun searchProductInfoByBarcode(barcodeNo: String) {
+        val successCode = "INFO-000"
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
-            viewModel.getProductNameByBarcode(barcodeNo).collectLatest { result ->
-                when(result) {
-                    is Result.Success -> {
-                        if(result.data.COO5.total_count != "0") {
-                            searchProductInfo(result.data.COO5.row[0].productName)
+            viewModel.requestProductInfoByBarcode(barcodeNo).collectLatest { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        if (result.data.COO5.result.code == successCode
+                            && result.data.COO5.total_count != "0") {
+                            Log.d(tag, "result success : $result")
+                            searchProductInfoByProductReportNo(result.data.COO5.row[0].productReportNo)
+                        } else {
+                            Log.d(tag,
+                                "result success with error code : ${result.data.COO5.result.msg}")
+                            //TODO : setResult 필요
+                            finish()
                         }
                     }
-                    is Result.Error -> {
-                        // TODO : setResult 필요함
+                    is ApiResult.Error -> {
+                        Log.d(tag, "result error : ${result.exception}")
+                        //TODO : setResult 필요
                         finish()
                     }
                 }
-
-
             }
         }
     }

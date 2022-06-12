@@ -1,4 +1,4 @@
-package com.nutrient.youngr2.remote
+package com.nutrient.youngr2.remote.services
 
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient

@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.nutrient.youngr2.databinding.ItemSearchResultBinding
-import com.nutrient.youngr2.view.productlist.adapter.holder.ProductInfoViewHolder
-import com.nutrient.youngr2.remote.models.ParsedProductInfoModel
+import com.nutrient.youngr2.view.productlist.holder.ProductInfoViewHolder
+import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
 
-class ProductInfoAdapter(private val clickListener: OnProductClickListener) : PagingDataAdapter<ParsedProductInfoModel, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
+class ProductInfoAdapter(private val clickListener: OnProductClickListener) : PagingDataAdapter<ParsedProductListItemModel, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
 
     interface OnProductClickListener {
-        fun onItemClick(data : ParsedProductInfoModel)
+        fun onItemClick(data : ParsedProductListItemModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductInfoViewHolder {
@@ -25,15 +25,15 @@ class ProductInfoAdapter(private val clickListener: OnProductClickListener) : Pa
         item?.let {  holder.bind(item) }
     }
     companion object {
-        private val PRODUCT_INFO_COMPARATOR = object : DiffUtil.ItemCallback<ParsedProductInfoModel>() {
+        private val PRODUCT_INFO_COMPARATOR = object : DiffUtil.ItemCallback<ParsedProductListItemModel>() {
             override fun areItemsTheSame(
-                oldItem: ParsedProductInfoModel,
-                newItem: ParsedProductInfoModel
+                oldItem: ParsedProductListItemModel,
+                newItem: ParsedProductListItemModel
             ): Boolean = oldItem.productId == newItem.productId
 
             override fun areContentsTheSame(
-                oldItem: ParsedProductInfoModel,
-                newItem: ParsedProductInfoModel
+                oldItem: ParsedProductListItemModel,
+                newItem: ParsedProductListItemModel
             ): Boolean = oldItem == newItem
         }
     }
