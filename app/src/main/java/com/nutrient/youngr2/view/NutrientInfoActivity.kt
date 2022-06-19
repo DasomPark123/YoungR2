@@ -38,7 +38,7 @@ class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.
     override fun afterOnCreate() {
         super.afterOnCreate()
         binding.apply {
-            nutrient = intent.getParcelableExtra(CustomApplication.EXTRA_PRODUCT_DATA)
+            nutrient = intent.getParcelableExtra(CustomApplication.EXTRA_PRODUCT_INFO)
             Log.d(tag, "data : $nutrient")
             Glide.with(this@NutrientInfoActivity)
                 .load(nutrient?.imageUrl)

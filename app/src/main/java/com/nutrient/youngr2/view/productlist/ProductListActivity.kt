@@ -20,6 +20,7 @@ import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
 import com.nutrient.youngr2.remote.services.ProductInfoService
 import com.nutrient.youngr2.repositories.ProductInfoRepository
 import com.nutrient.youngr2.remote.responses.ApiResult
+import com.nutrient.youngr2.remote.responses.ApiState
 import com.nutrient.youngr2.view.base.BaseActivity
 import com.nutrient.youngr2.view.NutrientInfoActivity
 import com.nutrient.youngr2.viewmodels.ProductInfoViewModel
@@ -33,7 +34,6 @@ class ProductListActivity :
 
     private lateinit var viewModel: ProductInfoViewModel
 
-    //    private lateinit var viewModelFactory: NutrientViewModelFactory
     private lateinit var productInfoAdapter: ProductInfoAdapter
     private lateinit var viewModelFactory: ProductInfoViewModelFactory
 
@@ -55,7 +55,7 @@ class ProductListActivity :
         actionBar?.let {
             actionBar.setDisplayHomeAsUpEnabled(true)
             intent?.let {
-                actionBar.title = intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)
+                actionBar.title = intent.getStringExtra(CustomApplication.EXTRA_PRODUCT_DATA)
             }
         }
 
@@ -64,31 +64,26 @@ class ProductListActivity :
             ProductInfoAdapter(clickListener = object : ProductInfoAdapter.OnProductClickListener {
                 override fun onItemClick(data: ParsedProductListItemModel) {
                     Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
-                        putExtra(CustomApplication.EXTRA_PRODUCT_DATA, data)
+                        putExtra(CustomApplication.EXTRA_PRODUCT_INFO, data)
                     }.run { startActivity(this) }
                 }
             }).apply {
                 addLoadStateListener { combinedLoadStates ->
-                    binding.apply {
-                        /* 로딩 중 */
-                        linearProgress.isVisible =
-                            combinedLoadStates.source.refresh is LoadState.Loading
-                        /* 로딩중 X, 에러 X */
-                        rvNutrients.isVisible =
-                            combinedLoadStates.source.refresh is LoadState.NotLoading
-                        /* 에러 발생 시 */
-                        linearError.isVisible = combinedLoadStates.source.refresh is LoadState.Error
-                        tvReload.setOnClickListener { productInfoAdapter.retry() }
-
-                        /* 로딩 X, 에러 X, 데이터가 없을 경우 */
-                        if (combinedLoadStates.source.refresh is LoadState.NotLoading
-                            && combinedLoadStates.append.endOfPaginationReached
-                            && productInfoAdapter.itemCount < 1
-                        ) {
-                            rvNutrients.isVisible = false
-                            tvNoData.isVisible = true
-                        } else {
-                            tvNoData.isVisible = false
+                    when (combinedLoadStates.source.refresh) {
+                        is LoadState.Loading -> {
+                            updateState(ApiState.LOADING)
+                        }
+                        is LoadState.NotLoading -> {
+                            if (combinedLoadStates.append.endOfPaginationReached
+                                && productInfoAdapter.itemCount < 1) {
+                                updateState(ApiState.NO_DATA)
+                            } else {
+                                updateState(ApiState.SUCCESS)
+                            }
+                        }
+                        is LoadState.Error -> {
+                            updateState(ApiState.ERROR)
+                            binding.tvReload.setOnClickListener { productInfoAdapter.retry() }
                         }
                     }
                 }
@@ -107,7 +102,6 @@ class ProductListActivity :
     /* Invoked from onCreate() in BaseActivity */
     override fun initViewModel() {
         super.initViewModel()
-        //viewModelFactory = NutrientViewModelFactory(NutrientRepository(NutrientService.client!!))
         viewModelFactory =
             ProductInfoViewModelFactory(
                 ProductInfoRepository(
@@ -121,28 +115,28 @@ class ProductListActivity :
     /* Invoked from onCreate() in BaseActivity */
     override fun afterOnCreate() {
         super.afterOnCreate()
-        intent.getStringExtra(CustomApplication.EXTRA_PRODUCT)
+        /* Product 이름 검색 */
+        intent.getStringExtra(CustomApplication.EXTRA_PRODUCT_DATA)
             ?.let { productName ->
-                /* Product 이름 검색 */
                 Log.d(tag, "Search Product")
                 searchProductInfoByProductName(productName)
             }
-            ?: run {
-                intent.getStringExtra(CustomApplication.EXTRA_BARCODE_DATA)
-                    ?.let { barcodeNo ->
-                        /* Barcode 로 검색 */
-                        Log.d(tag, "Search Barcode")
-                        searchProductInfoByBarcode(barcodeNo)
-                    }
-                    ?: run {
-                        /* List 로 검색 */
-                        Log.d(tag, "Search all data")
-                        searchAllProductInfo()
-                    }
+        /* Barcode 로 검색 */
+        intent.getStringExtra(CustomApplication.EXTRA_BARCODE_DATA)
+            ?.let { barcodeNo ->
+                Log.d(tag, "Search Barcode")
+                searchProductInfoByBarcode(barcodeNo)
+            }
+        /* 전체 상품 검색 */
+        intent.getStringExtra(CustomApplication.EXTRA_ALL_DATA)
+            ?.let {
+                Log.d(tag, "Search all data")
+                searchAllProductInfo()
             }
 
         intent.apply {
-            removeExtra(CustomApplication.EXTRA_PRODUCT)
+            removeExtra(CustomApplication.EXTRA_PRODUCT_DATA)
+            removeExtra(CustomApplication.EXTRA_ALL_DATA)
             removeExtra(CustomApplication.EXTRA_BARCODE_DATA)
         }
     }
@@ -157,6 +151,29 @@ class ProductListActivity :
         return super.onOptionsItemSelected(item)
     }
 
+    private fun updateState(apiState: ApiState) {
+        binding.apply {
+            when (apiState) {
+                ApiState.LOADING -> {
+                    linearProgress.isVisible = true
+                }
+                ApiState.NO_DATA -> {
+                    linearProgress.isVisible = false
+                    tvNoData.isVisible = true
+                }
+                ApiState.SUCCESS -> {
+                    linearProgress.isVisible = false
+                    rvNutrients.isVisible = true
+                }
+                ApiState.ERROR -> {
+                    linearProgress.isVisible = false
+                    linearError.isVisible = true
+                }
+            }
+        }
+    }
+
+    /* 상품이름으로 상품 정보 검색 후 리스트에 데이터 전달 */
     private fun searchProductInfoByProductName(product: String) {
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
@@ -168,37 +185,7 @@ class ProductListActivity :
         }
     }
 
-    /* TODO:Main 으로 옮기고 reportNo 검색 시 검색 결과가 없으면 product Name 으로 검색해서 리스트 뿌리기 */
-    private fun searchProductInfoByProductReportNo(reportNo: String) {
-        val successCode = "OK"
-        searchJob?.cancel()
-        searchJob = lifecycleScope.launch {
-            viewModel.requestProductInfoByProductReportNo(reportNo).collectLatest { result ->
-                when (result) {
-                    is ApiResult.Success -> {
-                        if (result.data.resultCode == successCode
-                            && result.data.totalCount != "0") {
-                            Log.d(tag, "result success : $result")
-                            Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
-                                putExtra(CustomApplication.EXTRA_PRODUCT_DATA, result.data.list[0])
-                            }.run { startActivity(this) }
-                        } else {
-                            Log.d(tag, "result success with error code: $result")
-                            //TODO : setResult 필요
-                            finish()
-                        }
-                    }
-                    is ApiResult.Error -> {
-                        Log.d(tag, "result success : $result")
-                        //TODO : setResult 필요
-                        finish()
-                    }
-                }
-
-            }
-        }
-    }
-
+    /* 모든 상품 조회 후 리스트로 데이터 전달 */
     private fun searchAllProductInfo() {
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
@@ -210,28 +197,72 @@ class ProductListActivity :
         }
     }
 
+    /* 바코드로 상품 정보 조회 */
     private fun searchProductInfoByBarcode(barcodeNo: String) {
         val successCode = "INFO-000"
         searchJob?.cancel()
+        updateState(ApiState.LOADING)
         searchJob = lifecycleScope.launch {
             viewModel.requestProductInfoByBarcode(barcodeNo).collectLatest { result ->
                 when (result) {
                     is ApiResult.Success -> {
-                        if (result.data.COO5.result.code == successCode
-                            && result.data.COO5.total_count != "0") {
-                            Log.d(tag, "result success : $result")
-                            searchProductInfoByProductReportNo(result.data.COO5.row[0].productReportNo)
+                        if (result.data.COO5.result.code == successCode) {
+                            if (result.data.COO5.total_count == "0") {
+                                /* 바코드와 일치하는 상품이 존재하지 않음 */
+                                updateState(ApiState.NO_DATA)
+                                /* Todo : 상품이름으로 한번 더 검색 */
+                            } else {
+                                /* 바코드로 상품 검색 성공 및 일치하는 상품 존재 */
+                                Log.d(tag, "result success : $result")
+                                searchProductInfoByProductReportNo(result.data.COO5.row[0].productReportNo)
+                            }
                         } else {
                             Log.d(tag,
                                 "result success with error code : ${result.data.COO5.result.msg}")
-                            //TODO : setResult 필요
-                            finish()
+                            updateState(ApiState.ERROR)
                         }
                     }
                     is ApiResult.Error -> {
                         Log.d(tag, "result error : ${result.exception}")
-                        //TODO : setResult 필요
-                        finish()
+                        updateState(ApiState.ERROR)
+                    }
+                }
+            }
+        }
+    }
+
+    /* ReportNo로 상품검색 */
+    private fun searchProductInfoByProductReportNo(reportNo: String) {
+        val successCode = "OK"
+        searchJob?.cancel()
+        updateState(ApiState.LOADING)
+        searchJob = lifecycleScope.launch {
+            viewModel.requestProductInfoByProductReportNo(reportNo).collectLatest { result ->
+                when (result) {
+                    is ApiResult.Success -> {
+                        if (result.data.resultCode == successCode) {
+                            if(result.data.totalCount == "0") {
+                                /* 바코드와 일치하는 상품이 존재하지 않음 */
+                                updateState(ApiState.NO_DATA)
+                            } else {
+                                /* ReportNo로 상품 검색 성공 및 일치하는 상품 존재 */
+                                Log.d(tag, "result success : $result")
+                                Intent(this@ProductListActivity,
+                                    NutrientInfoActivity::class.java).apply {
+                                    putExtra(CustomApplication.EXTRA_PRODUCT_INFO, result.data.list[0])
+                                }.run {
+                                    startActivity(this)
+                                    finish()
+                                }
+                            }
+                        } else {
+                            Log.d(tag, "result success with error code: $result")
+                            updateState(ApiState.ERROR)
+                        }
+                    }
+                    is ApiResult.Error -> {
+                        Log.d(tag, "result success : $result")
+                        updateState(ApiState.ERROR)
                     }
                 }
             }
