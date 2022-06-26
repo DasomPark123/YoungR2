@@ -1,14 +1,14 @@
-package com.nutrient.youngr2.view.productlist.adapter
+package com.nutrient.youngr2.views.product_list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.nutrient.youngr2.databinding.ItemSearchResultBinding
-import com.nutrient.youngr2.view.productlist.holder.ProductInfoViewHolder
+import com.nutrient.youngr2.views.product_list.holder.ProductInfoViewHolder
 import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
 
-class ProductInfoAdapter(private val clickListener: OnProductClickListener) : PagingDataAdapter<ParsedProductListItemModel, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
+class ProductInfoAdapter (private val clickListener: OnProductClickListener) : PagingDataAdapter<ParsedProductListItemModel, ProductInfoViewHolder>(PRODUCT_INFO_COMPARATOR) {
 
     interface OnProductClickListener {
         fun onItemClick(data : ParsedProductListItemModel)

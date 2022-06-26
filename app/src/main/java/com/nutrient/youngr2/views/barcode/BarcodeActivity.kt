@@ -1,17 +1,11 @@
-package com.nutrient.youngr2.view
+package com.nutrient.youngr2.views.barcode
 
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.provider.MediaStore
 import android.view.KeyEvent
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.journeyapps.barcodescanner.CaptureManager
 import com.nutrient.youngr2.R
 import com.nutrient.youngr2.databinding.ActivityBarcodeBinding
-import com.nutrient.youngr2.view.base.BaseActivity
+import com.nutrient.youngr2.base.BaseActivity
 
 class BarcodeActivity : BaseActivity<ActivityBarcodeBinding>(R.layout.activity_barcode) {
     private lateinit var capture : CaptureManager

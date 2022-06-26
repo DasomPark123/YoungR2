@@ -14,25 +14,8 @@ import com.nutrient.youngr2.remote.responses.safeCall
 import com.nutrient.youngr2.repositories.paging.ProductInfoPagingSource
 import kotlinx.coroutines.flow.Flow
 
-class ProductInfoRepository(
-    private val productClient: ProductInfoApi,
-    private val barcodeClient: BarcodeInfoApi) {
-
-    fun getProductInfoByProductName(product: String) : Flow<PagingData<ParsedProductListItemModel>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = ProductInfoPagingSource.NETWORK_PAGE_SIZE,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { ProductInfoPagingSource(productClient, product) }
-        ).flow
-    }
-
-    fun getProductInfoByProductReportNo(reportNo : String) : Flow<ApiResult<ParsedProductInfoModel>> = safeCallProductInfo {
-        productClient.getProductInfoByProductReportNo(prdlstReportNo = reportNo)
-    }
-
-    fun getProductNameByBarcode(barcodeNo : String) : Flow<ApiResult<BarcodeServiceModel>>  = safeCall {
-        barcodeClient.getProductByBarcode(barcodeNum = barcodeNo)
-    }
+interface ProductInfoRepository {
+    fun getProductInfoByProductName(product: String) : Flow<PagingData<ParsedProductListItemModel>>
+    fun getProductInfoByProductReportNo(reportNo : String) : Flow<ApiResult<ParsedProductInfoModel>>
+    fun getProductNameByBarcode(barcodeNo : String) : Flow<ApiResult<BarcodeServiceModel>>
 }

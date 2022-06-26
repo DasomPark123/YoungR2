@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id "org.jetbrains.kotlin.plugin.serialization" version "1.6.20-RC"
     id 'kotlin-parcelize'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -55,4 +56,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.13.1'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'com.google.zxing:core:3.4.1'
+    implementation "com.google.dagger:hilt-android:2.40"
+    kapt "com.google.dagger:hilt-android-compiler:2.40"
+    implementation 'androidx.activity:activity-ktx:1.1.0'
+    implementation 'androidx.fragment:fragment-ktx:1.2.5'
 }

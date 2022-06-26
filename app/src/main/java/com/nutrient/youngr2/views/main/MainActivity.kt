@@ -1,4 +1,4 @@
-package com.nutrient.youngr2.view
+package com.nutrient.youngr2.views.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,8 +14,9 @@ import com.nutrient.youngr2.application.CustomApplication
 import com.nutrient.youngr2.databinding.ActivityMainBinding
 import com.nutrient.youngr2.utils.hideKeyboard
 import com.nutrient.youngr2.utils.showSnackbar
-import com.nutrient.youngr2.view.base.BaseActivity
-import com.nutrient.youngr2.view.productlist.ProductListActivity
+import com.nutrient.youngr2.base.BaseActivity
+import com.nutrient.youngr2.views.barcode.BarcodeActivity
+import com.nutrient.youngr2.views.product_list.ProductListActivity
 
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 

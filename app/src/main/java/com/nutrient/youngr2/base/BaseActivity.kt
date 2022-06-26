@@ -1,4 +1,4 @@
-package com.nutrient.youngr2.view.base
+package com.nutrient.youngr2.base
 
 import android.os.Bundle
 import androidx.annotation.LayoutRes
@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 
-abstract class BaseActivity<T : ViewDataBinding>(@LayoutRes private val layoutId: Int) :
+abstract class BaseActivity<T : ViewDataBinding> (@LayoutRes private val layoutId: Int) :
     AppCompatActivity() {
 
     private val TAG: String = javaClass.simpleName

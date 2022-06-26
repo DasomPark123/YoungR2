@@ -4,7 +4,7 @@
     <data>
         <variable
             name="mainLayout"
-            type="com.nutrient.youngr2.view.MainActivity" />
+            type="com.nutrient.youngr2.views.main.MainActivity" />
     </data>
 
     <LinearLayout

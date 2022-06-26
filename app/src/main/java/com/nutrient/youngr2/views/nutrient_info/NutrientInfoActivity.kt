@@ -1,4 +1,4 @@
-package com.nutrient.youngr2.view
+package com.nutrient.youngr2.views.nutrient_info
 
 import android.os.Bundle
 import android.util.Log
@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.nutrient.youngr2.R
 import com.nutrient.youngr2.application.CustomApplication
 import com.nutrient.youngr2.databinding.ActivityNutrientInfoBinding
-import com.nutrient.youngr2.view.base.BaseActivity
+import com.nutrient.youngr2.base.BaseActivity
 
 class NutrientInfoActivity : BaseActivity<ActivityNutrientInfoBinding>(R.layout.activity_nutrient_info) {
 

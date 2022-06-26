@@ -1,41 +1,39 @@
-package com.nutrient.youngr2.view.productlist
+package com.nutrient.youngr2.views.product_list
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrient.youngr2.R
-import com.nutrient.youngr2.view.productlist.adapter.LoadingStateAdapter
-import com.nutrient.youngr2.view.productlist.adapter.ProductInfoAdapter
+import com.nutrient.youngr2.views.product_list.adapter.LoadingStateAdapter
+import com.nutrient.youngr2.views.product_list.adapter.ProductInfoAdapter
 import com.nutrient.youngr2.application.CustomApplication
 import com.nutrient.youngr2.databinding.ActivityNutrientListBinding
-import com.nutrient.youngr2.remote.services.BarcodeInfoService
-import com.nutrient.youngr2.viewmodels.factory.ProductInfoViewModelFactory
+import com.nutrient.youngr2.remote.models.BarcodeListItemModel
 import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
-import com.nutrient.youngr2.remote.services.ProductInfoService
-import com.nutrient.youngr2.repositories.ProductInfoRepository
 import com.nutrient.youngr2.remote.responses.ApiResult
 import com.nutrient.youngr2.remote.responses.ApiState
-import com.nutrient.youngr2.view.base.BaseActivity
-import com.nutrient.youngr2.view.NutrientInfoActivity
+import com.nutrient.youngr2.base.BaseActivity
+import com.nutrient.youngr2.views.nutrient_info.NutrientInfoActivity
 import com.nutrient.youngr2.viewmodels.ProductInfoViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ProductListActivity :
     BaseActivity<ActivityNutrientListBinding>(R.layout.activity_nutrient_list) {
     private val tag = javaClass.simpleName
 
-    private lateinit var viewModel: ProductInfoViewModel
+    private val viewModel : ProductInfoViewModel by viewModels()
 
     private lateinit var productInfoAdapter: ProductInfoAdapter
-    private lateinit var viewModelFactory: ProductInfoViewModelFactory
 
     private var searchJob: Job? = null
 
@@ -53,9 +51,14 @@ class ProductListActivity :
         // Init action bar
         val actionBar = supportActionBar
         actionBar?.let {
-            actionBar.setDisplayHomeAsUpEnabled(true)
             intent?.let {
-                actionBar.title = intent.getStringExtra(CustomApplication.EXTRA_PRODUCT_DATA)
+                val productName = intent.getStringExtra(CustomApplication.EXTRA_PRODUCT_DATA)
+                if (productName == null || productName == "") {
+                    actionBar.title = getString(R.string.app_name)
+                } else {
+                    actionBar.title = productName
+                    actionBar.setDisplayHomeAsUpEnabled(true)
+                }
             }
         }
 
@@ -97,19 +100,6 @@ class ProductListActivity :
                 footer = LoadingStateAdapter { productInfoAdapter.retry() }
             )
         }
-    }
-
-    /* Invoked from onCreate() in BaseActivity */
-    override fun initViewModel() {
-        super.initViewModel()
-        viewModelFactory =
-            ProductInfoViewModelFactory(
-                ProductInfoRepository(
-                    ProductInfoService.client!!,
-                    BarcodeInfoService.client!!
-                )
-            )
-        viewModel = ViewModelProvider(this, viewModelFactory).get(ProductInfoViewModel::class.java)
     }
 
     /* Invoked from onCreate() in BaseActivity */
@@ -206,20 +196,14 @@ class ProductListActivity :
             viewModel.requestProductInfoByBarcode(barcodeNo).collectLatest { result ->
                 when (result) {
                     is ApiResult.Success -> {
-                        if (result.data.COO5.result.code == successCode) {
-                            if (result.data.COO5.total_count == "0") {
-                                /* 바코드와 일치하는 상품이 존재하지 않음 */
-                                updateState(ApiState.NO_DATA)
-                                /* Todo : 상품이름으로 한번 더 검색 */
-                            } else {
-                                /* 바코드로 상품 검색 성공 및 일치하는 상품 존재 */
-                                Log.d(tag, "result success : $result")
-                                searchProductInfoByProductReportNo(result.data.COO5.row[0].productReportNo)
-                            }
+                        if (result.data.COO5.total_count == "0") {
+                            /* 바코드와 일치하는 상품이 존재하지 않음 */
+                            updateState(ApiState.NO_DATA)
+                            Log.d(tag, "result no data : $result")
                         } else {
-                            Log.d(tag,
-                                "result success with error code : ${result.data.COO5.result.msg}")
-                            updateState(ApiState.ERROR)
+                            /* 바코드로 상품 검색 성공 및 일치하는 상품 존재 */
+                            Log.d(tag, "result success : $result")
+                            searchProductInfoByProductReportNo(result.data.COO5.row[0])
                         }
                     }
                     is ApiResult.Error -> {
@@ -232,40 +216,37 @@ class ProductListActivity :
     }
 
     /* ReportNo로 상품검색 */
-    private fun searchProductInfoByProductReportNo(reportNo: String) {
+    private fun searchProductInfoByProductReportNo(barcodeInfo: BarcodeListItemModel) {
         val successCode = "OK"
         searchJob?.cancel()
         updateState(ApiState.LOADING)
         searchJob = lifecycleScope.launch {
-            viewModel.requestProductInfoByProductReportNo(reportNo).collectLatest { result ->
-                when (result) {
-                    is ApiResult.Success -> {
-                        if (result.data.resultCode == successCode) {
-                            if(result.data.totalCount == "0") {
-                                /* 바코드와 일치하는 상품이 존재하지 않음 */
-                                updateState(ApiState.NO_DATA)
+            viewModel.requestProductInfoByProductReportNo(barcodeInfo.productReportNo)
+                .collectLatest { result ->
+                    when (result) {
+                        is ApiResult.Success -> {
+                            if (result.data.totalCount == "0") {
+                                /* ReportNo와 일치하는 상품이 존재하지 않음. 상품이름으로 한번 더 검색 */
+                                searchProductInfoByProductName(barcodeInfo.productName)
                             } else {
                                 /* ReportNo로 상품 검색 성공 및 일치하는 상품 존재 */
                                 Log.d(tag, "result success : $result")
                                 Intent(this@ProductListActivity,
                                     NutrientInfoActivity::class.java).apply {
-                                    putExtra(CustomApplication.EXTRA_PRODUCT_INFO, result.data.list[0])
+                                    putExtra(CustomApplication.EXTRA_PRODUCT_INFO,
+                                        result.data.list[0])
                                 }.run {
                                     startActivity(this)
                                     finish()
                                 }
                             }
-                        } else {
-                            Log.d(tag, "result success with error code: $result")
+                        }
+                        is ApiResult.Error -> {
+                            Log.d(tag, "result success : $result")
                             updateState(ApiState.ERROR)
                         }
                     }
-                    is ApiResult.Error -> {
-                        Log.d(tag, "result success : $result")
-                        updateState(ApiState.ERROR)
-                    }
                 }
-            }
         }
     }
 }

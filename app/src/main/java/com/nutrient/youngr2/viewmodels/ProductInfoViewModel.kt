@@ -10,9 +10,12 @@ import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
 import com.nutrient.youngr2.remote.models.ProductInfoModel
 import com.nutrient.youngr2.repositories.ProductInfoRepository
 import com.nutrient.youngr2.remote.responses.ApiResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class ProductInfoViewModel(private val repository: ProductInfoRepository) : ViewModel() {
+@HiltViewModel
+class ProductInfoViewModel @Inject constructor(private val repository: ProductInfoRepository) : ViewModel() {
 
     private val tag = ProductInfoViewModel::class.java.simpleName
 

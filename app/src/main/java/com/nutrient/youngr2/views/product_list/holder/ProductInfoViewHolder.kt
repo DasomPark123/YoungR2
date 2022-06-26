@@ -1,9 +1,9 @@
-package com.nutrient.youngr2.view.productlist.holder
+package com.nutrient.youngr2.views.product_list.holder
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.nutrient.youngr2.R
-import com.nutrient.youngr2.view.productlist.adapter.ProductInfoAdapter
+import com.nutrient.youngr2.views.product_list.adapter.ProductInfoAdapter
 import com.nutrient.youngr2.databinding.ItemSearchResultBinding
 import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
 
