@@ -1,6 +1,7 @@
 package com.nutrient.youngr2.base
 
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -16,6 +17,7 @@ abstract class BaseActivity<T : ViewDataBinding> (@LayoutRes private val layoutI
     override fun onCreate(savedInstanceState: Bundle?) {
         beforeSetContentView()
         super.onCreate(savedInstanceState)
+        Log.d(TAG,"onCreate()")
         binding = DataBindingUtil.setContentView(this, layoutId)
 
         initView()

@@ -1,74 +1,62 @@
 package com.nutrient.youngr2.views.product_list
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
-import androidx.activity.viewModels
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.onNavDestinationSelected
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrient.youngr2.R
-import com.nutrient.youngr2.views.product_list.adapter.LoadingStateAdapter
-import com.nutrient.youngr2.views.product_list.adapter.ProductInfoAdapter
-import com.nutrient.youngr2.application.CustomApplication
-import com.nutrient.youngr2.databinding.ActivityNutrientListBinding
+import com.nutrient.youngr2.base.BaseFragment
+import com.nutrient.youngr2.databinding.FragmentProductListBinding
 import com.nutrient.youngr2.remote.models.BarcodeListItemModel
 import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
 import com.nutrient.youngr2.remote.responses.ApiResult
 import com.nutrient.youngr2.remote.responses.ApiState
-import com.nutrient.youngr2.base.BaseActivity
-import com.nutrient.youngr2.views.nutrient_info.NutrientInfoActivity
-import com.nutrient.youngr2.viewmodels.ProductInfoViewModel
+import com.nutrient.youngr2.views.product_list.adapter.LoadingStateAdapter
+import com.nutrient.youngr2.views.product_list.adapter.ProductListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ProductListActivity :
-    BaseActivity<ActivityNutrientListBinding>(R.layout.activity_nutrient_list) {
-    private val tag = javaClass.simpleName
+class ProductListFragment :
+    BaseFragment<FragmentProductListBinding>(R.layout.fragment_product_list) {
 
-    private val viewModel : ProductInfoViewModel by viewModels()
+    private val viewModel: ProductListViewModel by viewModels()
 
-    private lateinit var productInfoAdapter: ProductInfoAdapter
+    private lateinit var productListAdapter: ProductListAdapter
 
     private var searchJob: Job? = null
+    private val safeArgs: ProductListFragmentArgs by navArgs()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun beforeSetContentView() {
-        super.beforeSetContentView()
-        setTheme(R.style.Theme_SubTheme)
-    }
-
-    override fun initView() {
-        super.initView()
-        // Init action bar
-        val actionBar = supportActionBar
-        actionBar?.let {
-            intent?.let {
-                val productName = intent.getStringExtra(CustomApplication.EXTRA_PRODUCT_DATA)
-                if (productName == null || productName == "") {
-                    actionBar.title = getString(R.string.app_name)
-                } else {
-                    actionBar.title = productName
-                    actionBar.setDisplayHomeAsUpEnabled(true)
-                }
-            }
+    override fun init() {
+        /* Action bar 초기화 */
+        val actionBar = (activity as AppCompatActivity).supportActionBar
+        actionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            show()
         }
 
-        // Init adapter
-        productInfoAdapter =
-            ProductInfoAdapter(clickListener = object : ProductInfoAdapter.OnProductClickListener {
+        /* Adapter 초기화 */
+        productListAdapter =
+            ProductListAdapter(clickListener = object : ProductListAdapter.OnProductClickListener {
                 override fun onItemClick(data: ParsedProductListItemModel) {
-                    Intent(this@ProductListActivity, NutrientInfoActivity::class.java).apply {
-                        putExtra(CustomApplication.EXTRA_PRODUCT_INFO, data)
-                    }.run { startActivity(this) }
+                    Log.d(tag, "data : $data")
+                    navigateToProductInfoFragment(data)
                 }
             }).apply {
                 addLoadStateListener { combinedLoadStates ->
@@ -78,7 +66,7 @@ class ProductListActivity :
                         }
                         is LoadState.NotLoading -> {
                             if (combinedLoadStates.append.endOfPaginationReached
-                                && productInfoAdapter.itemCount < 1) {
+                                && productListAdapter.itemCount < 1) {
                                 updateState(ApiState.NO_DATA)
                             } else {
                                 updateState(ApiState.SUCCESS)
@@ -86,59 +74,53 @@ class ProductListActivity :
                         }
                         is LoadState.Error -> {
                             updateState(ApiState.ERROR)
-                            binding.tvReload.setOnClickListener { productInfoAdapter.retry() }
+                            binding.tvReload.setOnClickListener { productListAdapter.retry() }
                         }
                     }
                 }
             }
 
+        /* Recyclerview 초기화 */
         binding.rvNutrients.apply {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(this@ProductListActivity)
-            adapter = productInfoAdapter.withLoadStateHeaderAndFooter(
-                header = LoadingStateAdapter { productInfoAdapter.retry() },
-                footer = LoadingStateAdapter { productInfoAdapter.retry() }
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = productListAdapter.withLoadStateHeaderAndFooter(
+                header = LoadingStateAdapter { productListAdapter.retry() },
+                footer = LoadingStateAdapter { productListAdapter.retry() }
             )
         }
-    }
 
-    /* Invoked from onCreate() in BaseActivity */
-    override fun afterOnCreate() {
-        super.afterOnCreate()
         /* Product 이름 검색 */
-        intent.getStringExtra(CustomApplication.EXTRA_PRODUCT_DATA)
-            ?.let { productName ->
-                Log.d(tag, "Search Product")
-                searchProductInfoByProductName(productName)
-            }
+        if (safeArgs.productName.isNotEmpty()) {
+            Log.d(tag, "Search Product")
+            actionBar?.title = safeArgs.productName
+            searchProductInfoByProductName(safeArgs.productName)
+        }
         /* Barcode 로 검색 */
-        intent.getStringExtra(CustomApplication.EXTRA_BARCODE_DATA)
-            ?.let { barcodeNo ->
-                Log.d(tag, "Search Barcode")
-                searchProductInfoByBarcode(barcodeNo)
-            }
+        if (safeArgs.barcodeNo.isNotEmpty()) {
+            Log.d(tag, "Search Barcode")
+            actionBar?.title = ""
+            searchProductInfoByBarcode(safeArgs.barcodeNo)
+        }
         /* 전체 상품 검색 */
-        intent.getStringExtra(CustomApplication.EXTRA_ALL_DATA)
-            ?.let {
-                Log.d(tag, "Search all data")
-                searchAllProductInfo()
-            }
-
-        intent.apply {
-            removeExtra(CustomApplication.EXTRA_PRODUCT_DATA)
-            removeExtra(CustomApplication.EXTRA_ALL_DATA)
-            removeExtra(CustomApplication.EXTRA_BARCODE_DATA)
+        if (safeArgs.productName.isEmpty() && safeArgs.barcodeNo.isEmpty()) {
+            Log.d(tag, "Search all data")
+            actionBar?.title = requireContext().getString(R.string.title_all_product)
+            searchAllProductInfo()
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when(item.itemId) {
             android.R.id.home -> {
-                finish()
-                return true
+                findNavController().navigateUp()
+                true
+            }
+            else -> {
+                (item.onNavDestinationSelected(findNavController())
+                        || super.onOptionsItemSelected(item))
             }
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun updateState(apiState: ApiState) {
@@ -163,13 +145,23 @@ class ProductListActivity :
         }
     }
 
+    private fun navigateToProductInfoFragment(data: ParsedProductListItemModel) {
+        val action = ProductListFragmentDirections.nutrientInfoAction(productInfo = data)
+        findNavController().navigate(action)
+    }
+
+    private fun navigateToProductInfoFragmentByBarcode(data: ParsedProductListItemModel) {
+        val action = ProductListFragmentDirections.nutrientInfoActionByBarcode(productInfo = data)
+        findNavController().navigate(action)
+    }
+
     /* 상품이름으로 상품 정보 검색 후 리스트에 데이터 전달 */
     private fun searchProductInfoByProductName(product: String) {
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
             viewModel.requestProductInfoByProductName(product).collectLatest {
-                if (::productInfoAdapter.isInitialized) {
-                    productInfoAdapter.submitData(it)
+                if (::productListAdapter.isInitialized) {
+                    productListAdapter.submitData(it)
                 }
             }
         }
@@ -180,8 +172,8 @@ class ProductListActivity :
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
             viewModel.requestAllProductInfo().collectLatest {
-                if (::productInfoAdapter.isInitialized) {
-                    productInfoAdapter.submitData(it)
+                if (::productListAdapter.isInitialized) {
+                    productListAdapter.submitData(it)
                 }
             }
         }
@@ -231,14 +223,7 @@ class ProductListActivity :
                             } else {
                                 /* ReportNo로 상품 검색 성공 및 일치하는 상품 존재 */
                                 Log.d(tag, "result success : $result")
-                                Intent(this@ProductListActivity,
-                                    NutrientInfoActivity::class.java).apply {
-                                    putExtra(CustomApplication.EXTRA_PRODUCT_INFO,
-                                        result.data.list[0])
-                                }.run {
-                                    startActivity(this)
-                                    finish()
-                                }
+                                navigateToProductInfoFragmentByBarcode(result.data.list[0])
                             }
                         }
                         is ApiResult.Error -> {

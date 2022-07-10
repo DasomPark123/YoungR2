@@ -1,4 +1,7 @@
 <resources>
+    <string name="main">Main</string>
+    <string name="product_list">Product List</string>
+    <string name="product_info">Product Info</string>
     <!-- Main -->
     <string name="app_name">YoungR2</string>
     <string name="edit_text_hint">식품 이름을 입력하세요</string>
@@ -6,6 +9,7 @@
     <string name="search_by_barcode">바코드로 찾기</string>
 
     <!-- Product List -->
+    <string name="title_all_product">전체상품</string>
     <string name="data_road_error">데이터를 불러오는데 문제가 발생하였습니다.</string>
     <string name="reload_data"><u>다시 시도</u></string>
     <string name="no_data">검색한 상품이 존재하지 않습니다.</string>
@@ -19,6 +23,7 @@
     <string name="trans_fats">트랜스지방</string>
 
     <!-- Product Info -->
+    <string name="title_product_info">상품정보</string>
     <string name="sub_title">영양 성분 (1회 제공량당)</string>
     <string name="total_content">총 내용량 %sG</string>
     <string name="kcal">%sKcal</string>
@@ -37,4 +42,6 @@
     <!-- Alert dialog -->
     <string name="notification">Notification</string>
     <string name="ok">확인</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

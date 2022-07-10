@@ -1,6 +1,7 @@
 package com.nutrient.youngr2.remote.services
 
 import com.nutrient.youngr2.remote.api.BarcodeInfoApi
+import com.nutrient.youngr2.remote.services.base.BaseService
 
 object BarcodeInfoService : BaseService() {
     private const val BARCODE_INFO_URL = "https://openapi.foodsafetykorea.go.kr"

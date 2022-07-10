@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@+id/main_dest">
+
+    <fragment
+        android:id="@+id/main_dest"
+        android:name="com.nutrient.youngr2.views.main.MainFragment"
+        android:label="@string/main"
+        tools:layout="@layout/fragment_main">
+
+        <action
+            android:id="@+id/search_product_action"
+            app:destination="@+id/product_list_dest"
+            app:popUpTo="@id/main_dest"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/product_list_dest"
+        android:name="com.nutrient.youngr2.views.product_list.ProductListFragment"
+        android:label="@string/product_list"
+        tools:layout="@layout/fragment_product_list">
+
+        <argument
+            android:name="productName"
+            android:defaultValue=""
+            app:argType="string" />
+
+        <argument
+            android:name="barcodeNo"
+            android:defaultValue=""
+            app:argType="string" />
+
+        <action
+            android:id="@+id/nutrient_info_action"
+            app:destination="@+id/nutrient_info_dest"
+            app:popUpTo="@id/product_list_dest"/>
+
+        <action android:id="@+id/nutrient_info_action_by_barcode"
+            app:destination="@+id/nutrient_info_dest"
+            app:popUpTo="@id/main_dest"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/nutrient_info_dest"
+        android:name="com.nutrient.youngr2.views.nutrient_info.NutrientInfoFragment"
+        android:label="@string/product_info"
+        tools:layout="@layout/fragment_nutrient_info">
+
+        <argument
+            android:name="productInfo"
+            android:defaultValue="@null"
+            app:argType="com.nutrient.youngr2.remote.models.ParsedProductListItemModel"
+            app:nullable="true" />
+
+    </fragment>
+
+</navigation>
