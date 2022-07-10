@@ -8,6 +8,7 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 abstract class BaseFragment<T : ViewDataBinding>(
     @LayoutRes private val layoutId: Int
