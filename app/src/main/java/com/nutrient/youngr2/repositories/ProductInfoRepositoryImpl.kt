@@ -15,7 +15,7 @@ import com.nutrient.youngr2.repositories.paging.ProductInfoPagingSource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class ProductRepositoryImpl @Inject constructor(private val productInfoApi: ProductInfoApi, private val barcodeInfoApi: BarcodeInfoApi) : ProductInfoRepository {
+class ProductInfoRepositoryImpl @Inject constructor(private val productInfoApi: ProductInfoApi, private val barcodeInfoApi: BarcodeInfoApi) : ProductInfoRepository {
     override fun getProductInfoByProductName(product: String): Flow<PagingData<ParsedProductListItemModel>> {
         return Pager(
             config = PagingConfig(

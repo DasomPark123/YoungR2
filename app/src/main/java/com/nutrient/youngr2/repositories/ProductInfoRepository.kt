@@ -15,7 +15,7 @@ import com.nutrient.youngr2.repositories.paging.ProductInfoPagingSource
 import kotlinx.coroutines.flow.Flow
 
 interface ProductInfoRepository {
-    fun getProductInfoByProductName(product: String) : Flow<PagingData<ParsedProductListItemModel>>
-    fun getProductInfoByProductReportNo(reportNo : String) : Flow<ApiResult<ParsedProductInfoModel>>
-    fun getProductNameByBarcode(barcodeNo : String) : Flow<ApiResult<BarcodeServiceModel>>
+    fun getProductInfoByProductName(product: String): Flow<PagingData<ParsedProductListItemModel>>
+    fun getProductInfoByProductReportNo(reportNo: String): Flow<ApiResult<ParsedProductInfoModel>>
+    fun getProductNameByBarcode(barcodeNo: String): Flow<ApiResult<BarcodeServiceModel>>
 }

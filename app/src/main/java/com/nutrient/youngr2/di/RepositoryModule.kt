@@ -3,8 +3,7 @@ package com.nutrient.youngr2.di
 import com.nutrient.youngr2.remote.api.BarcodeInfoApi
 import com.nutrient.youngr2.remote.api.ProductInfoApi
 import com.nutrient.youngr2.repositories.ProductInfoRepository
-import com.nutrient.youngr2.repositories.ProductRepositoryImpl
-import dagger.Binds
+import com.nutrient.youngr2.repositories.ProductInfoRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +17,6 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun provideProductRepository(productInfoApi : ProductInfoApi, barcodeInfoApi: BarcodeInfoApi) : ProductInfoRepository {
-        return ProductRepositoryImpl(productInfoApi, barcodeInfoApi)
+        return ProductInfoRepositoryImpl(productInfoApi, barcodeInfoApi)
     }
 }
