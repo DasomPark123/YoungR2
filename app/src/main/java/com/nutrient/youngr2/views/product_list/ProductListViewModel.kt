@@ -7,14 +7,14 @@ import androidx.paging.cachedIn
 import com.nutrient.youngr2.remote.models.BarcodeServiceModel
 import com.nutrient.youngr2.remote.models.ParsedProductInfoModel
 import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
-import com.nutrient.youngr2.repositories.ProductInfoRepository
 import com.nutrient.youngr2.remote.responses.ApiResult
+import com.nutrient.youngr2.repositories.ProductListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductListViewModel @Inject constructor(private val repository: ProductInfoRepository) : ViewModel() {
+class ProductListViewModel @Inject constructor(private val repository: ProductListRepository) : ViewModel() {
 
     private val tag = ProductListViewModel::class.java.simpleName
 
