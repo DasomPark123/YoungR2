@@ -7,9 +7,11 @@ import com.nutrient.youngr2.repositories.ProductListRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FakeProdcutListRepository : ProductListRepository {
+class FakeProductListRepository : ProductListRepository {
     override fun getProductInfoByProductName(product: String): Flow<PagingData<ParsedProductListItemModel>> = flow {
-
+        val item = ParsedProductListItemModel(product = product, total_content = "1")
+        val pagingData = PagingData.from(listOf(item))
+        emit(pagingData)
     }
 
     override fun getProductInfoByProductReportNo(reportNo: String): Flow<ApiResult<ParsedProductInfoModel>> = flow {
