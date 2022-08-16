@@ -25,6 +25,7 @@ import com.nutrient.youngr2.remote.models.BarcodeListItemModel
 import com.nutrient.youngr2.remote.models.ParsedProductListItemModel
 import com.nutrient.youngr2.remote.responses.ApiResult
 import com.nutrient.youngr2.remote.responses.ApiState
+import com.nutrient.youngr2.utils.DEBUG
 import com.nutrient.youngr2.views.product_list.adapter.LoadingStateAdapter
 import com.nutrient.youngr2.views.product_list.adapter.ProductListAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -157,6 +158,7 @@ class ProductListFragment :
 
     /* 상품이름으로 상품 정보 검색 후 리스트에 데이터 전달 */
     private fun searchProductInfoByProductName(product: String) {
+        if(DEBUG) Log.d(tag, "searchProductInfoByProductName : + $product")
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
             viewModel.requestProductInfoByProductName(product).collectLatest {
@@ -170,7 +172,7 @@ class ProductListFragment :
     /* 모든 상품 조회 후 리스트로 데이터 전달 */
     private fun searchAllProductInfo() {
         searchJob?.cancel()
-        searchJob = lifecycleScope.launch {
+        searchJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.requestAllProductInfo().collectLatest {
                 if (::productListAdapter.isInitialized) {
                     productListAdapter.submitData(it)
@@ -184,7 +186,7 @@ class ProductListFragment :
         val successCode = "INFO-000"
         searchJob?.cancel()
         updateState(ApiState.LOADING)
-        searchJob = lifecycleScope.launch {
+        searchJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.requestProductInfoByBarcode(barcodeNo).collectLatest { result ->
                 when (result) {
                     is ApiResult.Success -> {
@@ -212,7 +214,7 @@ class ProductListFragment :
         val successCode = "OK"
         searchJob?.cancel()
         updateState(ApiState.LOADING)
-        searchJob = lifecycleScope.launch {
+        searchJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.requestProductInfoByProductReportNo(barcodeInfo.productReportNo)
                 .collectLatest { result ->
                     when (result) {

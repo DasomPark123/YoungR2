@@ -19,6 +19,7 @@ abstract class BaseActivity<T : ViewDataBinding> (@LayoutRes private val layoutI
         super.onCreate(savedInstanceState)
         Log.d(TAG,"onCreate()")
         binding = DataBindingUtil.setContentView(this, layoutId)
+        binding.lifecycleOwner = this
 
         initView()
         initViewModel()

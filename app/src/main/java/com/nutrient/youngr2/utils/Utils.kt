@@ -1,23 +1,9 @@
 package com.nutrient.youngr2.utils
 
-import android.app.Activity
-import android.content.Context
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import com.nutrient.youngr2.R
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+
+const val DEBUG = false
 
 const val CALORIE = "kcal"
 const val CARBOHYDRATE = "탄수화물"
